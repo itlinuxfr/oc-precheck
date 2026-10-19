@@ -1,0 +1,77 @@
+# Example oc-precheck configuration for a production cluster.
+#
+#   oc precheck --config examples/precheck.yaml
+#   oc precheck config validate --config examples/precheck.yaml
+#
+# Start from the full list of defaults with: oc precheck config default
+
+settings:
+  failOn: crit
+  skip: [csr]
+  groupByLabels: [topology.kubernetes.io/zone, node-role.kubernetes.io/infra]
+  quotaThreshold: 90
+  jobLongDuration: 1h
+
+severities:
+  mcp.paused: info          # EUS upgrade: worker pools paused on purpose
+  pdb.blocking: crit        # a blocking PDB is a no-go
+  quotas.full: crit
+  pods.failed: "off"        # evicted pods are noise
+  hcp.np-version-skew: info
+
+exclusions:
+  - rule: "pods.*"
+    namespaces: ["sandbox-*", "*-dev"]
+    reason: sandbox environments
+  - rule: pdb.blocking
+    namespaces: [openshift-storage]
+    reason: managed by the ODF operator
+  - rule: alerts.warning
+    names: [KubeCPUOvercommit, KubeMemoryOvercommit]
+    reason: overcommit accepted
+
+customRules:
+  - id: org.olm-manual-approval
+    description: OLM operators must use Manual approval in production
+    apiVersion: operators.coreos.com/v1alpha1
+    resource: subscriptions
+    expr: 'has(object.spec.installPlanApproval) && object.spec.installPlanApproval == "Manual"'
+    messageExpression: '"Subscription " + object.spec.name + " uses Automatic approval"'
+
+  - id: org.deploy-min-replicas
+    description: Application Deployments need at least 2 replicas to survive a drain
+    apiVersion: apps/v1
+    resource: deployments
+    match: '!object.metadata.namespace.startsWith("openshift-") && !object.metadata.namespace.startsWith("kube-")'
+    expr: '!has(object.spec.replicas) || object.spec.replicas == 0 || object.spec.replicas >= params.minReplicas'
+    messageExpression: '"single replica: " + object.metadata.name + " will be unavailable during the drain"'
+    params:
+      minReplicas: 2
+
+  - id: org.pvc-pending
+    description: No PVC Pending for more than 10 minutes
+    apiVersion: v1
+    resource: persistentvolumeclaims
+    expr: >-
+      object.status.phase != "Pending" ||
+      now - timestamp(object.metadata.creationTimestamp) < duration("10m")
+    message: PVC Pending for more than 10 minutes
+
+  - id: org.no-node-in-maintenance
+    description: No node may carry the maintenance label before the upgrade
+    apiVersion: v1
+    resource: nodes
+    labelSelector: example.com/maintenance=true
+    aggregate: true
+    expr: size(objects) == 0
+    messageExpression: '"nodes in maintenance: " + objects.map(n, n.metadata.name).join(", ")'
+    severity: crit
+
+  - id: org.hc-version-floor
+    description: From the hub, no HostedCluster below the minimum supported version
+    apiVersion: hypershift.openshift.io/v1beta1
+    resource: hostedclusters
+    expr: >-
+      !has(object.status.version) || !has(object.status.version.desired) ||
+      !object.status.version.desired.version.startsWith("4.14.")
+    messageExpression: '"HostedCluster " + object.metadata.name + " still runs 4.14"'

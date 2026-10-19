@@ -1,0 +1,16 @@
+name: Feature request
+description: Suggest a new check, rule or operation
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What would you like to detect or automate, and why?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: Could it be a custom CEL rule, or does it need a built-in check?

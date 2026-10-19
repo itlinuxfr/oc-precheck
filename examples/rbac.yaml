@@ -1,0 +1,115 @@
+# ClusterRoles for oc-precheck.
+#
+#   oc apply -f examples/rbac.yaml
+#   oc adm policy add-cluster-role-to-user oc-precheck-reader <user>
+#   oc adm policy add-cluster-role-to-user oc-precheck-operator <user>
+#
+# oc-precheck-reader:   the read-only checks (no pods/exec: alerts, silences
+#                       and etcd will report ERROR)
+# oc-precheck-operator: everything, including pods/exec in the monitoring and
+#                       etcd namespaces, cordon/drain and console banners.
+#
+# Grant oc-precheck-operator only to the people who run maintenances.
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: oc-precheck-reader
+  labels:
+    app.kubernetes.io/name: oc-precheck
+rules:
+  - apiGroups: [""]
+    resources: [nodes, pods, resourcequotas, persistentvolumeclaims]
+    verbs: [get, list]
+  - apiGroups: [policy]
+    resources: [poddisruptionbudgets]
+    verbs: [get, list]
+  - apiGroups: [batch]
+    resources: [jobs, cronjobs]
+    verbs: [get, list]
+  - apiGroups: [certificates.k8s.io]
+    resources: [certificatesigningrequests]
+    verbs: [get, list]
+  - apiGroups: [config.openshift.io]
+    resources: [clusterversions, clusteroperators, infrastructures]
+    verbs: [get, list]
+  - apiGroups: [operator.openshift.io]
+    resources: [etcds]
+    verbs: [get, list]
+  - apiGroups: [machineconfiguration.openshift.io]
+    resources: [machineconfigpools]
+    verbs: [get, list]
+  - apiGroups: [operators.coreos.com]
+    resources: [clusterserviceversions, subscriptions, catalogsources]
+    verbs: [get, list]
+  - apiGroups: [quota.openshift.io]
+    resources: [clusterresourcequotas]
+    verbs: [get, list]
+  - apiGroups: [hypershift.openshift.io]
+    resources: [hostedclusters, nodepools]
+    verbs: [get, list]
+  - apiGroups: [cluster.open-cluster-management.io]
+    resources: [managedclusters]
+    verbs: [get, list]
+  - apiGroups: [console.openshift.io]
+    resources: [consolenotifications]
+    verbs: [get, list]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: oc-precheck-operator
+  labels:
+    app.kubernetes.io/name: oc-precheck
+aggregationRule:
+  clusterRoleSelectors:
+    - matchLabels:
+        oc-precheck.io/aggregate-to-operator: "true"
+rules: []
+---
+# Read access is aggregated into the operator role.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: oc-precheck-operator-read
+  labels:
+    app.kubernetes.io/name: oc-precheck
+    oc-precheck.io/aggregate-to-operator: "true"
+rules:
+  - apiGroups: ["", policy, batch, certificates.k8s.io, config.openshift.io, operator.openshift.io,
+                machineconfiguration.openshift.io, operators.coreos.com, quota.openshift.io,
+                hypershift.openshift.io, cluster.open-cluster-management.io]
+    resources: [nodes, pods, resourcequotas, persistentvolumeclaims, poddisruptionbudgets, jobs, cronjobs,
+                certificatesigningrequests, clusterversions, clusteroperators, infrastructures, etcds,
+                machineconfigpools, clusterserviceversions, subscriptions, catalogsources,
+                clusterresourcequotas, hostedclusters, nodepools, managedclusters]
+    verbs: [get, list]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: oc-precheck-operator-write
+  labels:
+    app.kubernetes.io/name: oc-precheck
+    oc-precheck.io/aggregate-to-operator: "true"
+rules:
+  # alerts, silences (amtool) and etcd / defrag (etcdctl). ClusterRoles cannot
+  # be scoped to namespaces: bind this rule with RoleBindings in
+  # openshift-monitoring and openshift-etcd for a tighter setup.
+  - apiGroups: [""]
+    resources: [pods/exec]
+    verbs: [create, get]
+  # drain / uncordon
+  - apiGroups: [""]
+    resources: [nodes]
+    verbs: [patch]
+  - apiGroups: [""]
+    resources: [pods/eviction]
+    verbs: [create]
+  - apiGroups: [""]
+    resources: [pods]
+    verbs: [delete]
+  # console banner
+  - apiGroups: [console.openshift.io]
+    resources: [consolenotifications]
+    verbs: [get, list, create, update, delete]

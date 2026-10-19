@@ -1,0 +1,79 @@
+# https://goreleaser.com
+version: 2
+
+project_name: oc-precheck
+
+before:
+  hooks:
+    - go mod tidy
+    - go test ./...
+
+builds:
+  - id: oc-precheck
+    main: ./cmd/oc-precheck
+    binary: oc-precheck
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
+      - -X github.com/itlinuxfr/oc-precheck/internal/version.Version={{ .Tag }}
+      - -X github.com/itlinuxfr/oc-precheck/internal/version.Commit={{ .FullCommit }}
+      - -X github.com/itlinuxfr/oc-precheck/internal/version.Date={{ .CommitDate }}
+    mod_timestamp: "{{ .CommitTimestamp }}"
+    goos: [linux, darwin, windows]
+    goarch: [amd64, arm64]
+
+archives:
+  - id: default
+    formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - LICENSE
+      - README.md
+
+checksum:
+  name_template: checksums.txt
+
+sboms:
+  - artifacts: archive
+
+changelog:
+  use: github
+  sort: asc
+  groups:
+    - title: Features
+      regexp: '^.*?feat(\(.+\))??!?:.+$'
+      order: 0
+    - title: Bug fixes
+      regexp: '^.*?fix(\(.+\))??!?:.+$'
+      order: 1
+    - title: Others
+      order: 999
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+
+release:
+  draft: true
+  prerelease: auto
+
+# Krew (kubectl plugin index): uncomment once the plugin is accepted, or point
+# it to a personal index repository.
+# krews:
+#   - name: precheck
+#     homepage: https://github.com/itlinuxfr/oc-precheck
+#     short_description: Pre-upgrade checks and maintenance operations for OpenShift
+#     description: |
+#       Checks that an OpenShift 4 cluster is ready to be upgraded and helps run
+#       the maintenance around it: silences, console banner, etcd defrag, room
+#       drain, live node view, HyperShift HostedCluster status.
+#     repository:
+#       owner: itlinuxfr
+#       name: krew-index
