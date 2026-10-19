@@ -1,0 +1,31 @@
+name: Bug report
+description: Something does not work as expected
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: Command line used, actual output (redact cluster names, tokens and IPs).
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: oc-precheck version
+      description: Output of `oc precheck version`
+    validations:
+      required: true
+  - type: input
+    id: cluster
+    attributes:
+      label: Cluster version and topology
+      description: e.g. OpenShift 4.17.30, HighlyAvailable / hosted control plane / hub
+    validations:
+      required: true
