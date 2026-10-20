@@ -76,7 +76,7 @@ type Table struct {
 	Truncated int        `json:"truncated,omitempty"`
 }
 
-// AddRow appends a row; the level drives its colour.
+// AddRow appends a row; the level drives its color.
 func (t *Table) AddRow(l Level, cells ...string) {
 	t.Rows = append(t.Rows, cells)
 	t.RowLevels = append(t.RowLevels, l)

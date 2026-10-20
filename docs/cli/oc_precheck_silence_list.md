@@ -29,7 +29,7 @@ oc precheck silence list [flags]
       --kubeconfig string              Path to the kubeconfig file (default: $KUBECONFIG, then ~/.kube/config)
       --max-rows int                   Maximum rows per table (0 = unlimited) (default 50)
       --monitoring-namespace string    Namespace of the platform monitoring stack (default "openshift-monitoring")
-      --no-color                       Disable colors (also honours NO_COLOR)
+      --no-color                       Disable colors (also honors NO_COLOR)
   -o, --output string                  Output format: text, json or yaml (default "text")
       --password string                Password for basic authentication to the API server
       --proxy-url string               If provided, this URL will be used to connect via proxy

@@ -206,7 +206,7 @@ func CheckQuotas(ctx context.Context, env *Env, o *Options) *report.Section {
 		}
 	}
 	t.Limit(o.MaxRows)
-	s.Summary = fmt.Sprintf("%d quota(s) analysed, %d at or above %.0f%% on at least one resource", nQuotas, nOver, o.QuotaThreshold)
+	s.Summary = fmt.Sprintf("%d quota(s) analyzed, %d at or above %.0f%% on at least one resource", nQuotas, nOver, o.QuotaThreshold)
 	if nOver > 0 {
 		s.Add(report.Info, "An exhausted quota can prevent pods from being recreated during a drain (Deployment maxSurge, new StatefulSet pods)")
 	}

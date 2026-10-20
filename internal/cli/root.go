@@ -121,7 +121,7 @@ when installed as "oc-precheck" or "kubectl-precheck" in the PATH.`,
 	g.kube.AddFlags(pf)
 	pf.StringVar(&g.configPath, "config", "", "Configuration file (rules, thresholds, exclusions); defaults to $OCP_PRECHECK_CONFIG")
 	pf.StringVarP(&g.output, "output", "o", "text", "Output format: text, json or yaml")
-	pf.BoolVar(&g.noColor, "no-color", false, "Disable colors (also honours NO_COLOR)")
+	pf.BoolVar(&g.noColor, "no-color", false, "Disable colors (also honors NO_COLOR)")
 	pf.BoolVar(&g.o.Verbose, "verbose", false, "Also show healthy items")
 	pf.IntVar(&g.o.MaxRows, "max-rows", g.o.MaxRows, "Maximum rows per table (0 = unlimited)")
 	pf.DurationVar(&g.timeout, "timeout", 2*time.Hour, "Global timeout of the command")

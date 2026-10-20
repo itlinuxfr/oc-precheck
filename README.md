@@ -256,11 +256,11 @@ It refuses to run when:
 - the remaining capacity looks insufficient.
 
 Every target node is cordoned **before** draining, so that pods do not land in
-the same room. The drain then uses the eviction API, which honours PDBs.
+the same room. The drain then uses the eviction API, which honors PDBs.
 
 ## Output and exit codes
 
-`-o text` (default, coloured on a terminal), `-o json` or `-o yaml`.
+`-o text` (default, colored on a terminal), `-o json` or `-o yaml`.
 
 | Code | Meaning |
 |---|---|
@@ -288,7 +288,7 @@ still run.
 - Designed for OpenShift 4.12 and later, including HyperShift / hosted
   control planes (from the hub and from the hosted cluster). The project is
   young: the test suite runs against fake clients, so please report any
-  behaviour you see on a real cluster.
+  behavior you see on a real cluster.
 - Plain Kubernetes works for the generic checks (`nodes`, `pods`, `pdb`,
   `jobs`, `quotas`, `csr`, custom rules, drain, watch). The OpenShift-specific
   checks report `SKIP`.
