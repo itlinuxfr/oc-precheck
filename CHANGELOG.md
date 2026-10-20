@@ -7,6 +7,18 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- Scenarios carry their own checks: a `customRules` section (same format as
+  in the configuration file) adds CEL rules for the run, and a `check` step
+  can select the rules it evaluates with `rules: [id, …]`. Errors (CEL syntax,
+  unknown or duplicate ID) are reported before connecting to the cluster.
+- `oc upkit run --target-version`, validated against the update graph by the
+  clusterversion check of the scenario.
+- Guide: [write your own checks](docs/guide-custom-checks.md), step by step,
+  with tested examples in `examples/scenario-custom-rules.yaml`.
+
+## [0.4.0] - 2026-10-20
+
+### Added
 - Scenarios: `oc upkit run pre-upgrade|post-upgrade|FILE` chains checks and
   maintenance actions with a gate after each step (critical or failed step:
   stop; warnings: confirmation). `--dry-run` shows the plan, `--print` exports

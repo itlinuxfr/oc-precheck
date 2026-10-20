@@ -55,6 +55,7 @@ step, 3 usage or scenario error, 4 a step failed or the run was interrupted.`,
 			return runScenario(g, args[0], printYAML, act)
 		},
 	}
+	cmd.Flags().StringVar(&g.o.TargetVersion, "target-version", "", "Target version (e.g. 4.18.24), validated against the update graph by the clusterversion check")
 	cmd.Flags().BoolVar(&printYAML, "print", false, "Print the scenario as YAML and exit (to customize a built-in one)")
 	cmd.Flags().BoolVar(&act.dryRun, "dry-run", false, "Show the plan without running anything")
 	cmd.Flags().BoolVarP(&act.yes, "yes", "y", false, "Do not ask for confirmation (critical steps still stop the scenario)")
@@ -90,6 +91,9 @@ func runScenario(g *globals, ref string, printYAML bool, act actionFlags) error 
 	if printYAML {
 		_, err := g.streams.Out.Write(raw)
 		return err
+	}
+	if err := applyScenarioRules(g.o, sc); err != nil {
+		return usageError("invalid scenario %s: %w", ref, err)
 	}
 
 	ss, err := g.connect()
@@ -127,15 +131,20 @@ func runScenario(g *globals, ref string, printYAML bool, act actionFlags) error 
 	o := g.o
 	exec := &scenario.Executor{
 		Env: ss.env, Opts: o, Author: authorOrDefault(""), Log: g.streams.ErrOut,
-		RunChecks: func(ctx context.Context, only, skip []string) ([]*report.Section, error) {
+		RunChecks: func(ctx context.Context, step scenario.CheckStep) ([]*report.Section, error) {
+			only, skip := step.Checks, step.Skip
 			if len(only) == 0 && len(skip) == 0 && g.cfg != nil {
 				only, skip = g.cfg.Settings.Checks, g.cfg.Settings.Skip
 			}
-			selected, err := selectChecks(checks.All(), only, skip, len(o.CustomRules) > 0)
+			so := o
+			if len(step.Rules) > 0 {
+				so = withRules(o, step.Rules)
+			}
+			selected, err := selectChecks(checks.All(), only, skip, len(so.CustomRules) > 0)
 			if err != nil {
 				return nil, err
 			}
-			return runChecks(ctx, ss.env, o, selected), nil
+			return runChecks(ctx, ss.env, so, selected), nil
 		},
 	}
 	r := &scenario.Runner{
@@ -156,6 +165,44 @@ func runScenario(g *globals, ref string, printYAML bool, act actionFlags) error 
 	}
 	r.Run(ss.ctx, sc, run)
 	return ss.finishScenario()
+}
+
+// applyScenarioRules compiles the custom rules carried by the scenario,
+// adds them to those of the configuration file, and checks that the rules
+// referenced by the steps exist.
+func applyScenarioRules(o *checks.Options, sc *scenario.Scenario) error {
+	if len(sc.CustomRules) > 0 {
+		cfg := &checks.Config{CustomRules: sc.CustomRules}
+		if err := cfg.Apply(o, func(string) bool { return true }); err != nil {
+			return err
+		}
+	}
+	known := map[string]bool{}
+	for _, r := range o.CustomRules {
+		known[r.ID] = true
+	}
+	for _, id := range sc.RuleRefs() {
+		if !known[id] {
+			return fmt.Errorf("rules: unknown custom rule %q (declare it in customRules of the scenario or of --config)", id)
+		}
+	}
+	return nil
+}
+
+// withRules returns a copy of the options keeping only the given custom rules.
+func withRules(o *checks.Options, ids []string) *checks.Options {
+	keep := map[string]bool{}
+	for _, id := range ids {
+		keep[id] = true
+	}
+	c := *o
+	c.CustomRules = nil
+	for _, r := range o.CustomRules {
+		if keep[r.ID] {
+			c.CustomRules = append(c.CustomRules, r)
+		}
+	}
+	return &c
 }
 
 // finishScenario renders the report of a scenario and converts its outcome

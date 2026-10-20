@@ -109,8 +109,8 @@ type Executor struct {
 	Opts   *checks.Options
 	Author string    // silence author
 	Log    io.Writer // live progress of long actions
-	// RunChecks runs the selected read-only checks (empty = all).
-	RunChecks func(ctx context.Context, only, skip []string) ([]*report.Section, error)
+	// RunChecks runs the read-only checks selected by a check step.
+	RunChecks func(ctx context.Context, step CheckStep) ([]*report.Section, error)
 }
 
 // Exec performs one step.
@@ -118,7 +118,7 @@ func (e *Executor) Exec(ctx context.Context, st Step) []*report.Section {
 	one := func(s *report.Section) []*report.Section { return []*report.Section{s} }
 	switch {
 	case st.Check != nil:
-		secs, err := e.RunChecks(ctx, st.Check.Checks, st.Check.Skip)
+		secs, err := e.RunChecks(ctx, *st.Check)
 		if err != nil {
 			return one(report.NewSection("checks", "Checks").Fail(err, ""))
 		}

@@ -81,7 +81,7 @@ step holds exactly one operation:
 
 | Step | Fields (all optional unless noted) | Changes the cluster |
 |---|---|---|
-| `check` | `checks` (list, default: all), `skip` (list). With neither, `settings.checks` / `settings.skip` of the configuration file apply. | no |
+| `check` | `checks` (list, default: all), `skip` (list), `rules` (custom rule IDs evaluated at this step, default: all; the step must run the `custom` check). With neither `checks` nor `skip`, `settings.checks` / `settings.skip` of the configuration file apply. | no |
 | `silence` | `duration` (default `4h`), `comment`, `author` (default: current user), `matchers` (amtool syntax, default: every alert). Skipped when a silence created by oc-upkit muting every alert is already active. | yes |
 | `banner` | `text` (**required**), `name`, `location` (`BannerTop`, `BannerBottom`, `BannerTopBottom`), `color`, `background`, `link`, `linkText` | yes |
 | `defrag` | `minFragmentation` (%), `pause` (default `15s`), `commandTimeout` (default `60s`), `disarmAlarms` | yes |
@@ -108,6 +108,39 @@ steps:
   - job: {cronJob: openshift-etcd/etcd-backup, timeout: 1h}
   - check: {checks: [etcd, pods]}
 ```
+
+## Your own checks in a scenario
+
+A scenario can carry CEL rules in a `customRules` section, in the format of
+the configuration file. They are evaluated by the `custom` check of the
+`check` steps, together with the rules of the configuration file; `rules`
+selects some of them for one step:
+
+```yaml
+name: my-pre-upgrade
+customRules:
+  - id: site.argocd-synced
+    apiVersion: argoproj.io/v1alpha1
+    resource: applications
+    expr: >-
+      has(object.status) && has(object.status.sync) &&
+      object.status.sync.status == "Synced"
+steps:
+  - check: {}                                            # every check and rule
+  - check: {checks: [custom], rules: [site.argocd-synced]}  # only this rule
+```
+
+Step-by-step guide, with tested examples:
+[guide-custom-checks.md](guide-custom-checks.md).
+
+## Target version
+
+`oc upkit run pre-upgrade --target-version 4.18.24` validates the update
+path in the `clusterversion` check of the scenario, like
+`oc upkit check --target-version`. It can also be set in the configuration
+file (`settings.targetVersion`).
+
+## Configuration file
 
 The configuration file (`--config` / `UPKIT_CONFIG`) applies to the check
 steps as it does to `oc upkit check`: thresholds, severities, exclusions and
