@@ -4,6 +4,7 @@
 package cli
 
 import (
+	"context"
 	"fmt"
 	"sort"
 	"strings"
@@ -160,22 +161,7 @@ func runCheck(cmd *cobra.Command, g *globals, co *checkOptions) error {
 		fmt.Fprintf(g.streams.ErrOut, "Running %d check(s)…\n\n", len(selected))
 	}
 
-	results := make([]*report.Section, len(selected))
-	var wg sync.WaitGroup
-	for i, c := range selected {
-		wg.Add(1)
-		go func(i int, c checks.Check) {
-			defer wg.Done()
-			defer func() {
-				if r := recover(); r != nil {
-					results[i] = report.NewSection(c.Name, c.Description).Fail(fmt.Errorf("internal error: %v", r), "please report it")
-				}
-			}()
-			results[i] = c.Run(ss.ctx, ss.env, o)
-		}(i, c)
-	}
-	wg.Wait()
-	for _, s := range results {
+	for _, s := range runChecks(ss.ctx, ss.env, o, selected) {
 		ss.add(s)
 	}
 
@@ -224,6 +210,27 @@ func runCheck(cmd *cobra.Command, g *globals, co *checkOptions) error {
 		ss.add(checks.ActionDefrag(ss.ctx, ss.env, o, co.do))
 	}
 	return ss.finish(co.failOn)
+}
+
+// runChecks runs the checks concurrently and returns their sections in the
+// order of the list.
+func runChecks(ctx context.Context, env *checks.Env, o *checks.Options, selected []checks.Check) []*report.Section {
+	results := make([]*report.Section, len(selected))
+	var wg sync.WaitGroup
+	for i, c := range selected {
+		wg.Add(1)
+		go func(i int, c checks.Check) {
+			defer wg.Done()
+			defer func() {
+				if r := recover(); r != nil {
+					results[i] = report.NewSection(c.Name, c.Description).Fail(fmt.Errorf("internal error: %v", r), "please report it")
+				}
+			}()
+			results[i] = c.Run(ctx, env, o)
+		}(i, c)
+	}
+	wg.Wait()
+	return results
 }
 
 func selectChecks(all []checks.Check, only, skip []string, hasCustom bool) ([]checks.Check, error) {

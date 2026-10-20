@@ -1,0 +1,10 @@
+# Close the maintenance once the upgrade is finished.
+#
+# Customize it: oc upkit run post-upgrade --print > my-post-upgrade.yaml
+name: post-upgrade
+description: Checks that everything is back to normal, then removes the banner and silences
+steps:
+  # Gate: the banner and the silences stay in place while a check is critical.
+  - check: {}
+  - removeBanner: {}
+  - expireSilences: {}

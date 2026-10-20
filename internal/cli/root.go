@@ -130,7 +130,10 @@ when installed as "oc-upkit" or "kubectl-upkit" in the PATH.`,
 	pf.IntVar(&g.o.MaxRows, "max-rows", g.o.MaxRows, "Maximum rows per table (0 = unlimited)")
 	pf.DurationVar(&g.timeout, "timeout", 2*time.Hour, "Global timeout of the command")
 
-	root.AddGroup(&cobra.Group{ID: "checks", Title: "Checks:"}, &cobra.Group{ID: "ops", Title: "Operations:"}, &cobra.Group{ID: "config", Title: "Configuration:"})
+	root.AddGroup(&cobra.Group{ID: "scenarios", Title: "Scenarios:"}, &cobra.Group{ID: "checks", Title: "Checks:"}, &cobra.Group{ID: "ops", Title: "Operations:"}, &cobra.Group{ID: "config", Title: "Configuration:"})
+	runCmd := newRunCommand(g)
+	runCmd.GroupID = "scenarios"
+	root.AddCommand(runCmd)
 	for _, c := range []*cobra.Command{newCheckCommand(g), newWatchCommand(g)} {
 		c.GroupID = "checks"
 		root.AddCommand(c)

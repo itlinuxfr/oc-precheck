@@ -1,0 +1,21 @@
+# Prepare an OpenShift cluster for an upgrade. The upgrade itself is never
+# started by oc-upkit: run `oc adm upgrade` once this scenario is completed.
+#
+# Customize it: oc upkit run pre-upgrade --print > my-pre-upgrade.yaml
+name: pre-upgrade
+description: Checks, silence, console banner and etcd defragmentation before an upgrade
+steps:
+  # Gate: nothing is changed when a check is critical.
+  - check: {}
+  - silence:
+      duration: 4h
+      comment: OpenShift upgrade in progress (oc-upkit)
+  - banner:
+      text: OpenShift upgrade in progress
+  - defrag: {}
+  # Example of a site-specific step, e.g. an etcd backup CronJob:
+  # - job:
+  #     cronJob: openshift-etcd/etcd-backup
+  #     timeout: 1h
+  - check:
+      checks: [etcd, pods]

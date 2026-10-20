@@ -109,6 +109,10 @@ rules:
   - apiGroups: [""]
     resources: [pods]
     verbs: [delete]
+  # scenario "job" step: run a Job from a CronJob (e.g. an etcd backup)
+  - apiGroups: [batch]
+    resources: [jobs]
+    verbs: [create]
   # console banner
   - apiGroups: [console.openshift.io]
     resources: [consolenotifications]

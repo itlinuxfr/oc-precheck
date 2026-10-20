@@ -52,6 +52,7 @@ when installed as "oc-upkit" or "kubectl-upkit" in the PATH.
 * [oc upkit defrag](oc_upkit_defrag.md)	 - Defragment etcd member by member, leader last
 * [oc upkit drain](oc_upkit_drain.md)	 - Drain every node matching a label selector (e.g. a whole room)
 * [oc upkit rules](oc_upkit_rules.md)	 - List the rules with their default and effective severity
+* [oc upkit run](oc_upkit_run.md)	 - Run a scenario: checks and maintenance actions, step by step
 * [oc upkit silence](oc_upkit_silence.md)	 - Manage Alertmanager silences (shown with their UUID)
 * [oc upkit uncordon](oc_upkit_uncordon.md)	 - Make the nodes matching a label selector schedulable again
 * [oc upkit version](oc_upkit_version.md)	 - Print the version
