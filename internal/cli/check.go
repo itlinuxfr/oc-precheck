@@ -185,7 +185,7 @@ func runCheck(cmd *cobra.Command, g *globals, co *checkOptions) error {
 	ss.rep.Compute()
 	if ss.rep.Status >= report.Crit && !co.force && !co.act.dryRun && !co.removeBanner {
 		s := report.NewSection("actions", "Actions")
-		s.Add(report.Crit, "Actions cancelled: some checks are CRITICAL (--force to override)")
+		s.Add(report.Crit, "Actions canceled: some checks are CRITICAL (--force to override)")
 		ss.add(s)
 		return ss.finish(co.failOn)
 	}
@@ -203,7 +203,7 @@ func runCheck(cmd *cobra.Command, g *globals, co *checkOptions) error {
 		plan = append(plan, "defragment etcd member by member (leader last)")
 	}
 	if !co.act.dryRun && !co.act.yes && !g.confirm(fmt.Sprintf("Cluster %s (%s): %s. Continue?", ss.kc.Context, ss.kc.Server, strings.Join(plan, ", then "))) {
-		fmt.Fprintln(g.streams.ErrOut, "Actions cancelled.")
+		fmt.Fprintln(g.streams.ErrOut, "Actions canceled.")
 		return ss.finish(co.failOn)
 	}
 	if co.silence {

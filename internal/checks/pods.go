@@ -241,7 +241,7 @@ func CheckPods(ctx context.Context, env *Env, o *Options) *report.Section {
 			parts = append(parts, fmt.Sprintf("%d %s", counts[k], labels[k]))
 		}
 	}
-	s.Summary = fmt.Sprintf("%d pod(s) analysed", active)
+	s.Summary = fmt.Sprintf("%d pod(s) analyzed", active)
 	if len(parts) > 0 {
 		s.Summary += " — " + strings.Join(parts, ", ")
 	}

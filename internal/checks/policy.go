@@ -303,7 +303,7 @@ func (r *ruler) known(rule string) bool {
 }
 
 // eval returns the effective level for an object and whether to report it.
-// Using an uncatalogued rule is a programming error caught by the tests.
+// Using an uncataloged rule is a programming error caught by the tests.
 func (r *ruler) eval(rule, ns, name string) (report.Level, bool) {
 	if !r.known(rule) {
 		panic("rule not in catalog: " + rule)

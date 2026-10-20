@@ -103,7 +103,7 @@ type capacity struct {
 	cpuFree, memFree resource.Quantity
 }
 
-// PlanDrain analyses what draining the selected nodes implies: pods to
+// PlanDrain analyzes what draining the selected nodes implies: pods to
 // evict, blockers, PDBs and remaining capacity per zone.
 func PlanDrain(ctx context.Context, env *Env, o *Options, do DrainOptions) *DrainPlan {
 	s := report.NewSection("drain-plan", "Drain: pre-flight analysis")
@@ -477,7 +477,7 @@ func removePod(ctx context.Context, env *Env, pp plannedPod, do DrainOptions, lo
 			}
 			select {
 			case <-ctx.Done():
-				return fmt.Errorf("%w: %v", errEvictionBlocked, ctx.Err())
+				return fmt.Errorf("%w: %w", errEvictionBlocked, ctx.Err())
 			case <-time.After(do.RetryInterval):
 			}
 		}

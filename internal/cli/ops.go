@@ -109,7 +109,7 @@ func newDrainCommand(g *globals) *cobra.Command {
 zone. A pre-flight analysis is shown first: pods to evict, blocking pods (no
 controller, emptyDir), affected PodDisruptionBudgets and remaining capacity per
 zone. All target nodes are cordoned first (so that pods do not land in the same
-room), then drained through the eviction API: PodDisruptionBudgets are honoured
+room), then drained through the eviction API: PodDisruptionBudgets are honored
 and evictions retried; DaemonSet and static pods are ignored.
 
 The drain is refused when the selection contains control plane nodes, when
@@ -137,11 +137,11 @@ blocking pods remain or when the remaining capacity looks insufficient.`,
 			case plan.Section.Status == report.Error || len(plan.Nodes) == 0:
 				return ss.finish("crit")
 			case plan.Blocking > 0 && !do.CordonOnly:
-				ss.add(report.NewSection("drain", "Action: drain").Fail(errors.New("blocking pods present"), "drain cancelled"))
+				ss.add(report.NewSection("drain", "Action: drain").Fail(errors.New("blocking pods present"), "drain canceled"))
 				return ss.finish("crit")
 			case plan.Section.Status == report.Crit && !skipCapacity && !do.CordonOnly && !act.dryRun:
 				ss.add(report.NewSection("drain", "Action: drain").Fail(errors.New("remaining capacity looks insufficient"),
-					"drain cancelled (--skip-capacity-check to override)"))
+					"drain canceled (--skip-capacity-check to override)"))
 				return ss.finish("crit")
 			}
 			names := make([]string, 0, len(plan.Nodes))
@@ -153,7 +153,7 @@ blocking pods remain or when the remaining capacity looks insufficient.`,
 				verb = "Cordon"
 			}
 			if !act.dryRun && !act.yes && !g.confirm(fmt.Sprintf("Cluster %s: %s %d node(s) [%s]?", ss.kc.Context, verb, len(names), strings.Join(names, ", "))) {
-				fmt.Fprintln(g.streams.ErrOut, "Drain cancelled.")
+				fmt.Fprintln(g.streams.ErrOut, "Drain canceled.")
 				return ss.finish("crit")
 			}
 			do.DryRun, do.Log = act.dryRun, g.streams.ErrOut
@@ -253,7 +253,7 @@ func newBannerCommand(g *globals) *cobra.Command {
 		Aliases: []string{"delete", "rm"},
 		Short:   "Remove banners (default: " + checks.DefaultBannerName + ")",
 		RunE: func(_ *cobra.Command, args []string) error {
-			targets := append(names, args...)
+			targets := append(append([]string{}, names...), args...)
 			return g.single(func(ss *session) *report.Section {
 				return checks.ActionRemoveBanner(ss.ctx, ss.env, targets, all, rmDry)
 			})

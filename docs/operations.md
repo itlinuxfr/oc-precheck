@@ -119,7 +119,7 @@ Every target node is **cordoned first**, so that evicted pods do not land on
 another node of the same room. The nodes are then drained, `--parallel` of
 them at a time.
 
-Evictions go through the eviction API, so PDBs are honoured:
+Evictions go through the eviction API, so PDBs are honored:
 
 - a refused eviction (HTTP 429) is retried every 5 seconds until
   `--node-timeout`;

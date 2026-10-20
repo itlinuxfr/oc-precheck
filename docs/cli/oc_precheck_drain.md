@@ -8,7 +8,7 @@ Drain a set of nodes selected by label, typically a whole room / availability
 zone. A pre-flight analysis is shown first: pods to evict, blocking pods (no
 controller, emptyDir), affected PodDisruptionBudgets and remaining capacity per
 zone. All target nodes are cordoned first (so that pods do not land in the same
-room), then drained through the eviction API: PodDisruptionBudgets are honoured
+room), then drained through the eviction API: PodDisruptionBudgets are honored
 and evictions retried; DaemonSet and static pods are ignored.
 
 The drain is refused when the selection contains control plane nodes, when
@@ -62,7 +62,7 @@ oc precheck drain [flags]
       --insecure-skip-tls-verify       If true, the server's certificate will not be checked for validity. This will make your HTTPS connections insecure
       --kubeconfig string              Path to the kubeconfig file (default: $KUBECONFIG, then ~/.kube/config)
       --max-rows int                   Maximum rows per table (0 = unlimited) (default 50)
-      --no-color                       Disable colors (also honours NO_COLOR)
+      --no-color                       Disable colors (also honors NO_COLOR)
   -o, --output string                  Output format: text, json or yaml (default "text")
       --password string                Password for basic authentication to the API server
       --proxy-url string               If provided, this URL will be used to connect via proxy

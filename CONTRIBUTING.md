@@ -44,7 +44,7 @@ A test fails when a rule is used without being in the catalog, or when the
 catalog references an unknown check.
 
 Prefer a [custom CEL rule](docs/configuration.md#customrules) when the need
-is specific to one organisation.
+is specific to one organization.
 
 ## Guidelines
 
