@@ -1,7 +1,7 @@
 # https://goreleaser.com
 version: 2
 
-project_name: oc-precheck
+project_name: oc-upkit
 
 before:
   hooks:
@@ -9,18 +9,18 @@ before:
     - go test ./...
 
 builds:
-  - id: oc-precheck
-    main: ./cmd/oc-precheck
-    binary: oc-precheck
+  - id: oc-upkit
+    main: ./cmd/oc-upkit
+    binary: oc-upkit
     env:
       - CGO_ENABLED=0
     flags:
       - -trimpath
     ldflags:
       - -s -w
-      - -X github.com/itlinuxfr/oc-precheck/internal/version.Version={{ .Tag }}
-      - -X github.com/itlinuxfr/oc-precheck/internal/version.Commit={{ .FullCommit }}
-      - -X github.com/itlinuxfr/oc-precheck/internal/version.Date={{ .CommitDate }}
+      - -X github.com/itlinuxfr/oc-upkit/internal/version.Version={{ .Tag }}
+      - -X github.com/itlinuxfr/oc-upkit/internal/version.Commit={{ .FullCommit }}
+      - -X github.com/itlinuxfr/oc-upkit/internal/version.Date={{ .CommitDate }}
     mod_timestamp: "{{ .CommitTimestamp }}"
     goos: [linux, darwin, windows]
     goarch: [amd64, arm64]
@@ -67,9 +67,9 @@ release:
 # Krew (kubectl plugin index): uncomment once the plugin is accepted, or point
 # it to a personal index repository.
 # krews:
-#   - name: precheck
-#     homepage: https://github.com/itlinuxfr/oc-precheck
-#     short_description: Pre-upgrade checks and maintenance operations for OpenShift
+#   - name: upkit
+#     homepage: https://github.com/itlinuxfr/oc-upkit
+#     short_description: Upgrade toolkit for OpenShift: checks and maintenance operations
 #     description: |
 #       Checks that an OpenShift 4 cluster is ready to be upgraded and helps run
 #       the maintenance around it: silences, console banner, etcd defrag, room

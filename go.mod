@@ -1,4 +1,4 @@
-module github.com/itlinuxfr/oc-precheck
+module github.com/itlinuxfr/oc-upkit
 
 go 1.24.0
 

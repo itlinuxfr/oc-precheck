@@ -1,12 +1,12 @@
 # Configuration reference
 
-oc-precheck reads an optional YAML file given with `--config` (or the
-`OCP_PRECHECK_CONFIG` environment variable).
+oc-upkit reads an optional YAML file given with `--config` (or the
+`UPKIT_CONFIG` environment variable).
 
 ```bash
-oc precheck config default > precheck.yaml          # every setting and rule with its default
-oc precheck config validate --config precheck.yaml  # exit code 3 when invalid
-oc precheck rules --config precheck.yaml            # effective severity of every rule
+oc upkit config default > upkit.yaml          # every setting and rule with its default
+oc upkit config validate --config upkit.yaml  # exit code 3 when invalid
+oc upkit rules --config upkit.yaml            # effective severity of every rule
 ```
 
 **Precedence:** built-in defaults < configuration file < command-line flags.
@@ -72,7 +72,7 @@ severities:
 Quote `"off"`. Unquoted, YAML 1.1 reads it as the boolean `false`. That form
 is accepted too, but quoting is clearer.
 
-The list of rules is in [rules.md](rules.md), or run `oc precheck rules`.
+The list of rules is in [rules.md](rules.md), or run `oc upkit rules`.
 
 ## exclusions
 
@@ -87,7 +87,7 @@ globs:
 exclusions:
   - rule: "pods.*"                 # rule ID or pattern; empty means every rule
     namespaces: ["sandbox-*", "*-dev"]
-    reason: sandbox environments   # free text, shown by "oc precheck rules"
+    reason: sandbox environments   # free text, shown by "oc upkit rules"
   - rule: alerts.warning
     names: [KubeCPUOvercommit]     # for alerts, the name is the alertname
   - rule: csr.pending
@@ -112,7 +112,7 @@ used by Kubernetes ValidatingAdmissionPolicies.
 | Key | Required | Description |
 |---|---|---|
 | `id` | yes | Lowercase identifier (`a-z0-9 . _ -`), unique, usable in `severities` and `exclusions` |
-| `description` | | Shown in the report and in `oc precheck rules` |
+| `description` | | Shown in the report and in `oc upkit rules` |
 | `apiVersion` | yes | `v1`, `apps/v1`, `operators.coreos.com/v1alpha1`… |
 | `resource` | yes | Plural resource name: `deployments`, `subscriptions`… |
 | `namespaces` | | Restrict the list to these namespaces |
@@ -186,5 +186,5 @@ customRules:
     message: PVC Pending for more than 10 minutes
 ```
 
-More examples are in [../examples/precheck.yaml](../examples/precheck.yaml).
+More examples are in [../examples/upkit.yaml](../examples/upkit.yaml).
 They are exercised by the test suite.

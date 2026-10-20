@@ -1,18 +1,40 @@
-## oc precheck banner remove
+## oc upkit completion bash
 
-Remove banners (default: oc-precheck-maintenance)
+Generate the autocompletion script for bash
+
+### Synopsis
+
+Generate the autocompletion script for the bash shell.
+
+This script depends on the 'bash-completion' package.
+If it is not installed already, you can install it via your OS's package manager.
+
+To load completions in your current shell session:
+
+	source <(oc-upkit completion bash)
+
+To load completions for every new session, execute once:
+
+#### Linux:
+
+	oc-upkit completion bash > /etc/bash_completion.d/oc-upkit
+
+#### macOS:
+
+	oc-upkit completion bash > $(brew --prefix)/etc/bash_completion.d/oc-upkit
+
+You will need to start a new shell for this setup to take effect.
+
 
 ```
-oc precheck banner remove [NAME...] [flags]
+oc upkit completion bash
 ```
 
 ### Options
 
 ```
-      --all            Remove every banner created by oc-precheck
-      --dry-run        Show what would be removed
-  -h, --help           help for remove
-      --name strings   Banner name(s) to remove
+  -h, --help              help for bash
+      --no-descriptions   disable completion descriptions
 ```
 
 ### Options inherited from parent commands
@@ -25,7 +47,7 @@ oc precheck banner remove [NAME...] [flags]
       --client-certificate string      Path to a client certificate file for TLS
       --client-key string              Path to a client key file for TLS
       --cluster string                 The name of the kubeconfig cluster to use
-      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $OCP_PRECHECK_CONFIG
+      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $UPKIT_CONFIG
       --context string                 The name of the kubeconfig context to use
       --disable-compression            If true, opt-out of response compression for all requests to the server
       --insecure-skip-tls-verify       If true, the server's certificate will not be checked for validity. This will make your HTTPS connections insecure
@@ -47,5 +69,5 @@ oc precheck banner remove [NAME...] [flags]
 
 ### SEE ALSO
 
-* [oc precheck banner](oc_precheck_banner.md)	 - Manage the web console banner (ConsoleNotification)
+* [oc upkit completion](oc_upkit_completion.md)	 - Generate the autocompletion script for the specified shell
 

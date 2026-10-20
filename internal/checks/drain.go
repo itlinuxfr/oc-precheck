@@ -1,4 +1,4 @@
-// Copyright 2026 The oc-precheck Authors.
+// Copyright 2026 The oc-upkit Authors.
 // SPDX-License-Identifier: Apache-2.0
 
 package checks
@@ -21,7 +21,7 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/types"
 
-	"github.com/itlinuxfr/oc-precheck/internal/report"
+	"github.com/itlinuxfr/oc-upkit/internal/report"
 )
 
 // DrainOptions configures the drain of a set of nodes selected by label,
@@ -386,7 +386,7 @@ func ExecuteDrain(ctx context.Context, env *Env, o *Options, plan *DrainPlan, do
 		s.Escalate(lvl)
 	}
 	s.Summary = fmt.Sprintf("%d/%d node(s) drained — selector %q", ok, len(results), do.Selector)
-	s.Add(report.Info, "Put the nodes back in service with: oc precheck uncordon --selector '%s'", do.Selector)
+	s.Add(report.Info, "Put the nodes back in service with: oc upkit uncordon --selector '%s'", do.Selector)
 	return s
 }
 

@@ -1,11 +1,42 @@
-## oc precheck config
+## oc upkit completion zsh
 
-Generate or validate a configuration file
+Generate the autocompletion script for zsh
+
+### Synopsis
+
+Generate the autocompletion script for the zsh shell.
+
+If shell completion is not already enabled in your environment you will need
+to enable it.  You can execute the following once:
+
+	echo "autoload -U compinit; compinit" >> ~/.zshrc
+
+To load completions in your current shell session:
+
+	source <(oc-upkit completion zsh)
+
+To load completions for every new session, execute once:
+
+#### Linux:
+
+	oc-upkit completion zsh > "${fpath[1]}/_oc-upkit"
+
+#### macOS:
+
+	oc-upkit completion zsh > $(brew --prefix)/share/zsh/site-functions/_oc-upkit
+
+You will need to start a new shell for this setup to take effect.
+
+
+```
+oc upkit completion zsh [flags]
+```
 
 ### Options
 
 ```
-  -h, --help   help for config
+  -h, --help              help for zsh
+      --no-descriptions   disable completion descriptions
 ```
 
 ### Options inherited from parent commands
@@ -18,7 +49,7 @@ Generate or validate a configuration file
       --client-certificate string      Path to a client certificate file for TLS
       --client-key string              Path to a client key file for TLS
       --cluster string                 The name of the kubeconfig cluster to use
-      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $OCP_PRECHECK_CONFIG
+      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $UPKIT_CONFIG
       --context string                 The name of the kubeconfig context to use
       --disable-compression            If true, opt-out of response compression for all requests to the server
       --insecure-skip-tls-verify       If true, the server's certificate will not be checked for validity. This will make your HTTPS connections insecure
@@ -40,7 +71,5 @@ Generate or validate a configuration file
 
 ### SEE ALSO
 
-* [oc precheck](oc_precheck.md)	 - Pre-upgrade checks and maintenance operations for OpenShift 4
-* [oc precheck config default](oc_precheck_config_default.md)	 - Print the default configuration (every setting and rule with its default value)
-* [oc precheck config validate](oc_precheck_config_validate.md)	 - Validate a configuration file (exit code 3 when invalid)
+* [oc upkit completion](oc_upkit_completion.md)	 - Generate the autocompletion script for the specified shell
 

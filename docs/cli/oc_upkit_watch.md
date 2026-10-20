@@ -1,42 +1,38 @@
-## oc precheck completion zsh
+## oc upkit watch
 
-Generate the autocompletion script for zsh
+Live view of nodes, MachineConfigPools and HostedClusters
 
 ### Synopsis
 
-Generate the autocompletion script for the zsh shell.
-
-If shell completion is not already enabled in your environment you will need
-to enable it.  You can execute the following once:
-
-	echo "autoload -U compinit; compinit" >> ~/.zshrc
-
-To load completions in your current shell session:
-
-	source <(oc-precheck completion zsh)
-
-To load completions for every new session, execute once:
-
-#### Linux:
-
-	oc-precheck completion zsh > "${fpath[1]}/_oc-precheck"
-
-#### macOS:
-
-	oc-precheck completion zsh > $(brew --prefix)/share/zsh/site-functions/_oc-precheck
-
-You will need to start a new shell for this setup to take effect.
-
+Live view during an upgrade or a maintenance: node status, cordon,
+machine-config-daemon state and rendered config (current → target), pool and
+cluster update progress; on a HyperShift hub, HostedClusters and NodePools.
+Press Ctrl-C to quit.
 
 ```
-oc precheck completion zsh [flags]
+oc upkit watch [flags]
+```
+
+### Examples
+
+```
+  oc upkit watch
+  oc upkit watch --selector topology.kubernetes.io/zone=room-a --interval 5s
+  oc upkit watch --problems
 ```
 
 ### Options
 
 ```
-  -h, --help              help for zsh
-      --no-descriptions   disable completion descriptions
+      --hcp-filter strings   Restrict to HostedClusters (globs)
+  -h, --help                 help for watch
+      --interval duration    Refresh interval (default 10s)
+      --no-hcp               Do not show HostedClusters (hub)
+      --no-pods              Do not count pods per node (lighter on large clusters)
+      --once                 Refresh once and exit
+      --problems             Only show nodes that are not nominal
+  -l, --selector string      Only show nodes matching this label selector
+      --zone-label string    Node label holding the zone / room (default "topology.kubernetes.io/zone")
 ```
 
 ### Options inherited from parent commands
@@ -49,7 +45,7 @@ oc precheck completion zsh [flags]
       --client-certificate string      Path to a client certificate file for TLS
       --client-key string              Path to a client key file for TLS
       --cluster string                 The name of the kubeconfig cluster to use
-      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $OCP_PRECHECK_CONFIG
+      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $UPKIT_CONFIG
       --context string                 The name of the kubeconfig context to use
       --disable-compression            If true, opt-out of response compression for all requests to the server
       --insecure-skip-tls-verify       If true, the server's certificate will not be checked for validity. This will make your HTTPS connections insecure
@@ -71,5 +67,5 @@ oc precheck completion zsh [flags]
 
 ### SEE ALSO
 
-* [oc precheck completion](oc_precheck_completion.md)	 - Generate the autocompletion script for the specified shell
+* [oc upkit](oc_upkit.md)	 - Upgrade toolkit for OpenShift 4: pre-upgrade checks and maintenance operations
 

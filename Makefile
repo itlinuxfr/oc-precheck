@@ -1,5 +1,5 @@
-BINARY   := oc-precheck
-MODULE   := github.com/itlinuxfr/oc-precheck
+BINARY   := oc-upkit
+MODULE   := github.com/itlinuxfr/oc-upkit
 VERSION  ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
 COMMIT   ?= $(shell git rev-parse HEAD 2>/dev/null)
 DATE     ?= $(shell date -u +%Y-%m-%dT%H:%M:%SZ)
@@ -20,15 +20,15 @@ help: ## Show this help
 	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*##/ {printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 .PHONY: build
-build: ## Build bin/oc-precheck for the current platform
-	go build -trimpath -ldflags '$(LDFLAGS)' -o bin/$(BINARY) ./cmd/oc-precheck
+build: ## Build bin/oc-upkit for the current platform
+	go build -trimpath -ldflags '$(LDFLAGS)' -o bin/$(BINARY) ./cmd/oc-upkit
 
 .PHONY: plugin-install
 plugin-install: build ## Install as oc / kubectl plugin into $(PREFIX)
 	install -d $(PREFIX)
 	install -m 0755 bin/$(BINARY) $(PREFIX)/$(BINARY)
-	ln -sf $(PREFIX)/$(BINARY) $(PREFIX)/kubectl-precheck
-	@echo "Installed: try 'oc precheck --help' (make sure $(PREFIX) is in your PATH)"
+	ln -sf $(PREFIX)/$(BINARY) $(PREFIX)/kubectl-upkit
+	@echo "Installed: try 'oc upkit --help' (make sure $(PREFIX) is in your PATH)"
 
 .PHONY: cross
 cross: ## Build binaries for every platform into dist/
@@ -36,7 +36,7 @@ cross: ## Build binaries for every platform into dist/
 		os=$${p%/*}; arch=$${p#*/}; ext=; [ $$os = windows ] && ext=.exe; \
 		echo "building $$os/$$arch"; \
 		GOOS=$$os GOARCH=$$arch go build -trimpath -ldflags '$(LDFLAGS)' \
-			-o dist/$(BINARY)_$${os}_$${arch}$$ext ./cmd/oc-precheck || exit 1; \
+			-o dist/$(BINARY)_$${os}_$${arch}$$ext ./cmd/oc-upkit || exit 1; \
 	done
 
 .PHONY: test
@@ -63,7 +63,7 @@ lint: ## Run golangci-lint (https://golangci-lint.run)
 .PHONY: docs
 docs: ## Regenerate docs/cli, docs/rules.md and docs/default-config.yaml
 	rm -rf docs/cli
-	go run ./cmd/oc-precheck gen-docs --dir docs
+	go run ./cmd/oc-upkit gen-docs --dir docs
 
 .PHONY: docs-check
 docs-check: docs ## Fail when the generated documentation is not up to date

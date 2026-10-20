@@ -15,6 +15,7 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -22,7 +23,7 @@ import (
 	"k8s.io/client-go/kubernetes/fake"
 	k8stesting "k8s.io/client-go/testing"
 
-	"github.com/itlinuxfr/oc-precheck/internal/report"
+	"github.com/itlinuxfr/oc-upkit/internal/report"
 )
 
 func boolPtr(b bool) *bool { return &b }
@@ -98,7 +99,7 @@ customRules:
 `
 
 func writeTemp(t *testing.T, content string) string {
-	p := filepath.Join(t.TempDir(), "precheck.yaml")
+	p := filepath.Join(t.TempDir(), "upkit.yaml")
 	if err := os.WriteFile(p, []byte(content), 0o600); err != nil {
 		t.Fatal(err)
 	}
@@ -449,7 +450,7 @@ func TestBanner(t *testing.T) {
 		t.Fatalf("update %+v", s.Findings)
 	}
 	l := ListBanners(ctx, env)
-	if r := l.Tables[0].Rows; len(r) != 1 || r[0][2] != "Upgrade completed" || r[0][1] != "BannerTopBottom" || r[0][5] != "oc-precheck" {
+	if r := l.Tables[0].Rows; len(r) != 1 || r[0][2] != "Upgrade completed" || r[0][1] != "BannerTopBottom" || r[0][5] != "oc-upkit" {
 		t.Fatalf("list %v", r)
 	}
 	if s := ActionBanner(ctx, env, BannerOptions{Name: "x", Text: "t", Location: "Middle"}); s.Status != report.Error {
@@ -458,6 +459,25 @@ func TestBanner(t *testing.T) {
 	ActionRemoveBanner(ctx, env, []string{"maint"}, false, false)
 	if l := ListBanners(ctx, env); len(l.Tables[0].Rows) != 0 {
 		t.Fatal("banner not removed")
+	}
+}
+
+func TestRemoveAllBannersIncludesLegacy(t *testing.T) {
+	banner := func(name, managedBy string) *unstructured.Unstructured {
+		b := u("console.openshift.io/v1", "ConsoleNotification", "", name,
+			map[string]any{"spec": map[string]any{"text": "t", "location": "BannerTop"}})
+		if managedBy != "" {
+			b.SetLabels(map[string]string{managedByLabel: managedBy})
+		}
+		return b
+	}
+	env := &Env{Dyn: newDyn(banner("new", managedByValue), banner("old", legacyManagedByValue), banner("foreign", ""))}
+	ctx := context.Background()
+	if s := ActionRemoveBanner(ctx, env, nil, true, false); s.Summary != "2 banner(s)" {
+		t.Fatalf("remove --all: %q %+v", s.Summary, s.Findings)
+	}
+	if r := ListBanners(ctx, env).Tables[0].Rows; len(r) != 1 || r[0][0] != "foreign" {
+		t.Fatalf("only the foreign banner must remain: %v", r)
 	}
 }
 
@@ -543,7 +563,7 @@ func TestCatalogUnique(t *testing.T) {
 
 // The shipped example configuration must load and its rules must behave.
 func TestExampleConfig(t *testing.T) {
-	cfg, err := LoadConfig("../../examples/precheck.yaml")
+	cfg, err := LoadConfig("../../examples/upkit.yaml")
 	if err != nil {
 		t.Fatal(err)
 	}

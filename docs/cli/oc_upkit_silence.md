@@ -1,24 +1,21 @@
-## oc precheck uncordon
+## oc upkit silence
 
-Make the nodes matching a label selector schedulable again
-
-```
-oc precheck uncordon [flags]
-```
+Manage Alertmanager silences (shown with their UUID)
 
 ### Examples
 
 ```
-  oc precheck uncordon -l topology.kubernetes.io/zone=room-a
+  oc upkit silence list
+  oc upkit silence add --duration 4h --comment "Upgrade to 4.18 — CHG0012345"
+  oc upkit silence add --matcher 'namespace=~openshift-.*' --matcher 'severity!=critical'
+  oc upkit silence expire 6f0c3c2e-1111-2222-3333-444455556666
 ```
 
 ### Options
 
 ```
-      --dry-run           Show what would be done without changing anything
-  -h, --help              help for uncordon
-  -l, --selector string   Label selector of the nodes (required)
-  -y, --yes               Do not ask for confirmation
+  -h, --help                          help for silence
+      --monitoring-namespace string   Namespace of the platform monitoring stack (default "openshift-monitoring")
 ```
 
 ### Options inherited from parent commands
@@ -31,7 +28,7 @@ oc precheck uncordon [flags]
       --client-certificate string      Path to a client certificate file for TLS
       --client-key string              Path to a client key file for TLS
       --cluster string                 The name of the kubeconfig cluster to use
-      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $OCP_PRECHECK_CONFIG
+      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $UPKIT_CONFIG
       --context string                 The name of the kubeconfig context to use
       --disable-compression            If true, opt-out of response compression for all requests to the server
       --insecure-skip-tls-verify       If true, the server's certificate will not be checked for validity. This will make your HTTPS connections insecure
@@ -53,5 +50,8 @@ oc precheck uncordon [flags]
 
 ### SEE ALSO
 
-* [oc precheck](oc_precheck.md)	 - Pre-upgrade checks and maintenance operations for OpenShift 4
+* [oc upkit](oc_upkit.md)	 - Upgrade toolkit for OpenShift 4: pre-upgrade checks and maintenance operations
+* [oc upkit silence add](oc_upkit_silence_add.md)	 - Create a silence (default: every alert)
+* [oc upkit silence expire](oc_upkit_silence_expire.md)	 - Expire silences
+* [oc upkit silence list](oc_upkit_silence_list.md)	 - List active silences
 

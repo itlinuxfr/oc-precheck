@@ -1,29 +1,20 @@
-## oc precheck config default
+## oc upkit banner
 
-Print the default configuration (every setting and rule with its default value)
-
-### Synopsis
-
-Print the default configuration as YAML: every setting with its default value,
-every rule with its default severity, and commented examples of exclusions and
-custom CEL rules. It is generated from the code and always up to date.
-
-```
-oc precheck config default [flags]
-```
+Manage the web console banner (ConsoleNotification)
 
 ### Examples
 
 ```
-  oc precheck config default > precheck.yaml
-  oc precheck config default --output-file precheck.yaml
+  oc upkit banner set --text "Upgrade to 4.18 in progress — CHG0012345" --link https://itsm.example.com/CHG0012345
+  oc upkit banner list
+  oc upkit banner remove
+  oc upkit banner remove --all
 ```
 
 ### Options
 
 ```
-  -h, --help                 help for default
-  -f, --output-file string   Write to this file instead of stdout (never overwrites)
+  -h, --help   help for banner
 ```
 
 ### Options inherited from parent commands
@@ -36,7 +27,7 @@ oc precheck config default [flags]
       --client-certificate string      Path to a client certificate file for TLS
       --client-key string              Path to a client key file for TLS
       --cluster string                 The name of the kubeconfig cluster to use
-      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $OCP_PRECHECK_CONFIG
+      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $UPKIT_CONFIG
       --context string                 The name of the kubeconfig context to use
       --disable-compression            If true, opt-out of response compression for all requests to the server
       --insecure-skip-tls-verify       If true, the server's certificate will not be checked for validity. This will make your HTTPS connections insecure
@@ -58,5 +49,8 @@ oc precheck config default [flags]
 
 ### SEE ALSO
 
-* [oc precheck config](oc_precheck_config.md)	 - Generate or validate a configuration file
+* [oc upkit](oc_upkit.md)	 - Upgrade toolkit for OpenShift 4: pre-upgrade checks and maintenance operations
+* [oc upkit banner list](oc_upkit_banner_list.md)	 - List the banners
+* [oc upkit banner remove](oc_upkit_banner_remove.md)	 - Remove banners (default: oc-upkit-maintenance)
+* [oc upkit banner set](oc_upkit_banner_set.md)	 - Create or update a banner
 

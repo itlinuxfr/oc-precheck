@@ -1,21 +1,15 @@
-## oc precheck silence
+## oc upkit banner list
 
-Manage Alertmanager silences (shown with their UUID)
-
-### Examples
+List the banners
 
 ```
-  oc precheck silence list
-  oc precheck silence add --duration 4h --comment "Upgrade to 4.18 — CHG0012345"
-  oc precheck silence add --matcher 'namespace=~openshift-.*' --matcher 'severity!=critical'
-  oc precheck silence expire 6f0c3c2e-1111-2222-3333-444455556666
+oc upkit banner list [flags]
 ```
 
 ### Options
 
 ```
-  -h, --help                          help for silence
-      --monitoring-namespace string   Namespace of the platform monitoring stack (default "openshift-monitoring")
+  -h, --help   help for list
 ```
 
 ### Options inherited from parent commands
@@ -28,7 +22,7 @@ Manage Alertmanager silences (shown with their UUID)
       --client-certificate string      Path to a client certificate file for TLS
       --client-key string              Path to a client key file for TLS
       --cluster string                 The name of the kubeconfig cluster to use
-      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $OCP_PRECHECK_CONFIG
+      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $UPKIT_CONFIG
       --context string                 The name of the kubeconfig context to use
       --disable-compression            If true, opt-out of response compression for all requests to the server
       --insecure-skip-tls-verify       If true, the server's certificate will not be checked for validity. This will make your HTTPS connections insecure
@@ -50,8 +44,5 @@ Manage Alertmanager silences (shown with their UUID)
 
 ### SEE ALSO
 
-* [oc precheck](oc_precheck.md)	 - Pre-upgrade checks and maintenance operations for OpenShift 4
-* [oc precheck silence add](oc_precheck_silence_add.md)	 - Create a silence (default: every alert)
-* [oc precheck silence expire](oc_precheck_silence_expire.md)	 - Expire silences
-* [oc precheck silence list](oc_precheck_silence_list.md)	 - List active silences
+* [oc upkit banner](oc_upkit_banner.md)	 - Manage the web console banner (ConsoleNotification)
 

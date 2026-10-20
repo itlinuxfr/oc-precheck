@@ -1,40 +1,49 @@
-## oc precheck completion bash
+## oc upkit drain
 
-Generate the autocompletion script for bash
+Drain every node matching a label selector (e.g. a whole room)
 
 ### Synopsis
 
-Generate the autocompletion script for the bash shell.
+Drain a set of nodes selected by label, typically a whole room / availability
+zone. A pre-flight analysis is shown first: pods to evict, blocking pods (no
+controller, emptyDir), affected PodDisruptionBudgets and remaining capacity per
+zone. All target nodes are cordoned first (so that pods do not land in the same
+room), then drained through the eviction API: PodDisruptionBudgets are honored
+and evictions retried; DaemonSet and static pods are ignored.
 
-This script depends on the 'bash-completion' package.
-If it is not installed already, you can install it via your OS's package manager.
-
-To load completions in your current shell session:
-
-	source <(oc-precheck completion bash)
-
-To load completions for every new session, execute once:
-
-#### Linux:
-
-	oc-precheck completion bash > /etc/bash_completion.d/oc-precheck
-
-#### macOS:
-
-	oc-precheck completion bash > $(brew --prefix)/etc/bash_completion.d/oc-precheck
-
-You will need to start a new shell for this setup to take effect.
-
+The drain is refused when the selection contains control plane nodes, when
+blocking pods remain or when the remaining capacity looks insufficient.
 
 ```
-oc precheck completion bash
+oc upkit drain [flags]
+```
+
+### Examples
+
+```
+  oc upkit drain --selector topology.kubernetes.io/zone=room-a --dry-run
+  oc upkit drain -l topology.kubernetes.io/zone=room-a --parallel 2 --delete-emptydir-data
+  oc upkit drain -l example.com/room=dc1-a --cordon-only
+  oc upkit uncordon -l topology.kubernetes.io/zone=room-a
 ```
 
 ### Options
 
 ```
-  -h, --help              help for bash
-      --no-descriptions   disable completion descriptions
+      --cordon-only             Cordon without draining
+      --delete-emptydir-data    Accept losing emptyDir volumes
+      --dry-run                 Show what would be done without changing anything
+      --force                   Delete pods without a controller (they will not be recreated)
+      --grace-period int        Pod grace period in seconds (-1 = the pod's own value) (default -1)
+  -h, --help                    help for drain
+      --include-control-plane   Allow control plane nodes in the selection
+      --node-timeout duration   Maximum drain duration per node (default 30m0s)
+      --parallel int            Number of nodes drained at the same time (default 1)
+      --pod-parallel int        Concurrent evictions per node (default 5)
+  -l, --selector string         Label selector of the nodes to drain (required)
+      --skip-capacity-check     Proceed even if the remaining capacity looks insufficient
+  -y, --yes                     Do not ask for confirmation
+      --zone-label string       Node label holding the zone / room (default "topology.kubernetes.io/zone")
 ```
 
 ### Options inherited from parent commands
@@ -47,7 +56,7 @@ oc precheck completion bash
       --client-certificate string      Path to a client certificate file for TLS
       --client-key string              Path to a client key file for TLS
       --cluster string                 The name of the kubeconfig cluster to use
-      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $OCP_PRECHECK_CONFIG
+      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $UPKIT_CONFIG
       --context string                 The name of the kubeconfig context to use
       --disable-compression            If true, opt-out of response compression for all requests to the server
       --insecure-skip-tls-verify       If true, the server's certificate will not be checked for validity. This will make your HTTPS connections insecure
@@ -69,5 +78,5 @@ oc precheck completion bash
 
 ### SEE ALSO
 
-* [oc precheck completion](oc_precheck_completion.md)	 - Generate the autocompletion script for the specified shell
+* [oc upkit](oc_upkit.md)	 - Upgrade toolkit for OpenShift 4: pre-upgrade checks and maintenance operations
 

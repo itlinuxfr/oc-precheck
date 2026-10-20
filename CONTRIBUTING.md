@@ -12,13 +12,13 @@ make test         # unit tests
 make cover        # race detector + coverage
 make lint         # golangci-lint v2 (https://golangci-lint.run)
 make docs         # regenerate docs/cli, docs/rules.md and docs/default-config.yaml
-make build        # bin/oc-precheck
+make build        # bin/oc-upkit
 ```
 
 ## Project layout
 
 ```
-cmd/oc-precheck/        main package (thin)
+cmd/oc-upkit/        main package (thin)
 internal/cli/           cobra commands, flags, configuration loading, exit codes
 internal/checks/        checks, rule policy, CEL custom rules, operations
 internal/report/        result model and text / JSON / YAML rendering

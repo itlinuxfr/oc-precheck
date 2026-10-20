@@ -1,9 +1,9 @@
-// Copyright 2026 The oc-precheck Authors.
+// Copyright 2026 The oc-upkit Authors.
 // SPDX-License-Identifier: Apache-2.0
 
 // Package version exposes build information injected at link time:
 //
-//	go build -ldflags "-X github.com/itlinuxfr/oc-precheck/internal/version.Version=v1.0.0 ..."
+//	go build -ldflags "-X github.com/itlinuxfr/oc-upkit/internal/version.Version=v1.0.0 ..."
 package version
 
 import (
@@ -58,7 +58,7 @@ func (i Info) String() string {
 	if len(c) > 12 {
 		c = c[:12]
 	}
-	return fmt.Sprintf("oc-precheck %s (commit %s, built %s, %s, %s)", i.Version, orUnknown(c), orUnknown(i.Date), i.GoVersion, i.Platform)
+	return fmt.Sprintf("oc-upkit %s (commit %s, built %s, %s, %s)", i.Version, orUnknown(c), orUnknown(i.Date), i.GoVersion, i.Platform)
 }
 
 func orUnknown(s string) string {

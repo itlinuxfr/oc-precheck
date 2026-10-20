@@ -1,17 +1,17 @@
-# oc-precheck
+# oc-upkit
 
-[![CI](https://github.com/itlinuxfr/oc-precheck/actions/workflows/ci.yml/badge.svg)](https://github.com/itlinuxfr/oc-precheck/actions/workflows/ci.yml)
-[![Go Report Card](https://goreportcard.com/badge/github.com/itlinuxfr/oc-precheck)](https://goreportcard.com/report/github.com/itlinuxfr/oc-precheck)
+[![CI](https://github.com/itlinuxfr/oc-upkit/actions/workflows/ci.yml/badge.svg)](https://github.com/itlinuxfr/oc-upkit/actions/workflows/ci.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/itlinuxfr/oc-upkit)](https://goreportcard.com/report/github.com/itlinuxfr/oc-upkit)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 
-**Pre-upgrade checks and maintenance operations for OpenShift 4, as an `oc` plugin.**
+**Upgrade toolkit for OpenShift 4: pre-upgrade checks and maintenance operations, as an `oc` plugin.**
 
-`oc precheck` tells you whether a cluster is ready to be upgraded, and helps you
+`oc upkit` tells you whether a cluster is ready to be upgraded, and helps you
 run everything around the upgrade or a datacenter maintenance:
 
 ```console
-$ oc precheck --target-version 4.18.24
-oc-precheck — OpenShift pre-upgrade checks
+$ oc upkit --target-version 4.18.24
+oc-upkit — OpenShift pre-upgrade checks
   Context  : admin/api-prod-example-com:6443
   Version  : 4.17.30
   Channel  : stable-4.18
@@ -69,7 +69,7 @@ Summary
   installs as an `oc` / `kubectl` plugin.
 
 > On OpenShift 4.20+, `oc adm upgrade recommend` performs some update-risk
-> checks. oc-precheck is complementary: it covers the cluster health items of
+> checks. oc-upkit is complementary: it covers the cluster health items of
 > the Red Hat "upgrade pre-checks" knowledge article and adds configurable
 > rules and maintenance operations.
 
@@ -83,29 +83,29 @@ found in the `PATH` as `oc <name>`.
 ```bash
 VERSION=v0.3.0
 OS=linux ARCH=amd64          # linux|darwin|windows, amd64|arm64
-curl -sSLO "https://github.com/itlinuxfr/oc-precheck/releases/download/${VERSION}/oc-precheck_${VERSION#v}_${OS}_${ARCH}.tar.gz"
-tar xzf "oc-precheck_${VERSION#v}_${OS}_${ARCH}.tar.gz" oc-precheck
-install -m 0755 oc-precheck ~/.local/bin/oc-precheck            # or /usr/local/bin
-ln -sf ~/.local/bin/oc-precheck ~/.local/bin/kubectl-precheck   # optional: kubectl precheck
+curl -sSLO "https://github.com/itlinuxfr/oc-upkit/releases/download/${VERSION}/oc-upkit_${VERSION#v}_${OS}_${ARCH}.tar.gz"
+tar xzf "oc-upkit_${VERSION#v}_${OS}_${ARCH}.tar.gz" oc-upkit
+install -m 0755 oc-upkit ~/.local/bin/oc-upkit            # or /usr/local/bin
+ln -sf ~/.local/bin/oc-upkit ~/.local/bin/kubectl-upkit   # optional: kubectl upkit
 
 oc plugin list
-oc precheck version
+oc upkit version
 ```
 
-On Windows, put `oc-precheck.exe` in a folder of your `PATH`.
+On Windows, put `oc-upkit.exe` in a folder of your `PATH`.
 
 ### With Go
 
 ```bash
-go install github.com/itlinuxfr/oc-precheck/cmd/oc-precheck@latest
+go install github.com/itlinuxfr/oc-upkit/cmd/oc-upkit@latest
 ```
 
 ### From source
 
 ```bash
-git clone https://github.com/itlinuxfr/oc-precheck && cd oc-precheck
-make build            # ./bin/oc-precheck
-make plugin-install   # copies it to ~/.local/bin as oc-precheck and kubectl-precheck
+git clone https://github.com/itlinuxfr/oc-upkit && cd oc-upkit
+make build            # ./bin/oc-upkit
+make plugin-install   # copies it to ~/.local/bin as oc-upkit and kubectl-upkit
 ```
 
 See [docs/installation.md](docs/installation.md) for checksums, air-gapped
@@ -116,30 +116,30 @@ installs and RHEL notes.
 ```bash
 oc login https://api.my-cluster.example.com:6443
 
-oc precheck                                  # all checks (same as "oc precheck check")
-oc precheck --checks etcd,mcp,pdb --verbose  # a subset, healthy items included
-oc precheck --target-version 4.18.24         # validate the update path too
-oc precheck -o json > precheck.json          # machine-readable report
+oc upkit                                  # all checks (same as "oc upkit check")
+oc upkit --checks etcd,mcp,pdb --verbose  # a subset, healthy items included
+oc upkit --target-version 4.18.24         # validate the update path too
+oc upkit -o json > upkit.json          # machine-readable report
 
-oc precheck config default > precheck.yaml   # every setting and rule, with defaults
-oc precheck --config precheck.yaml
+oc upkit config default > upkit.yaml   # every setting and rule, with defaults
+oc upkit --config upkit.yaml
 ```
 
 ## Commands
 
 | Command | Description |
 |---|---|
-| `oc precheck [check]` | Run the pre-upgrade checks (default command). Optional actions: `--silence`, `--banner`, `--remove-banner`, `--defrag`. |
-| `oc precheck watch` | Live view: nodes (Ready, cordon, MCD state, rendered config current → target, pods), MCPs, cluster update progress; HostedClusters/NodePools on a hub. |
-| `oc precheck drain -l SELECTOR` | Pre-flight analysis, then cordon and drain every node matching a label selector (e.g. a room). |
-| `oc precheck uncordon -l SELECTOR` | Put nodes back in service. |
-| `oc precheck banner set\|remove\|list` | Web console banner (ConsoleNotification). |
-| `oc precheck silence list\|add\|expire` | Alertmanager silences. |
-| `oc precheck defrag` | etcd defragmentation, one member at a time, leader last. |
-| `oc precheck rules` | Rule catalog with default and effective severity. |
-| `oc precheck config default\|validate` | Generate the default configuration / validate a file. |
-| `oc precheck version` | Version and build information. |
-| `oc precheck completion bash\|zsh\|fish\|powershell` | Shell completion. |
+| `oc upkit [check]` | Run the pre-upgrade checks (default command). Optional actions: `--silence`, `--banner`, `--remove-banner`, `--defrag`. |
+| `oc upkit watch` | Live view: nodes (Ready, cordon, MCD state, rendered config current → target, pods), MCPs, cluster update progress; HostedClusters/NodePools on a hub. |
+| `oc upkit drain -l SELECTOR` | Pre-flight analysis, then cordon and drain every node matching a label selector (e.g. a room). |
+| `oc upkit uncordon -l SELECTOR` | Put nodes back in service. |
+| `oc upkit banner set\|remove\|list` | Web console banner (ConsoleNotification). |
+| `oc upkit silence list\|add\|expire` | Alertmanager silences. |
+| `oc upkit defrag` | etcd defragmentation, one member at a time, leader last. |
+| `oc upkit rules` | Rule catalog with default and effective severity. |
+| `oc upkit config default\|validate` | Generate the default configuration / validate a file. |
+| `oc upkit version` | Version and build information. |
+| `oc upkit completion bash\|zsh\|fish\|powershell` | Shell completion. |
 
 Every command accepts the standard connection flags (`--kubeconfig`,
 `--context`, `--cluster`, `--user`, `--server`, `--token`, `--as`,
@@ -148,7 +148,7 @@ Every command accepts the standard connection flags (`--kubeconfig`,
 `--verbose`, `--max-rows`, `--no-color` and `--timeout`. Commands that change
 the cluster ask for confirmation and accept `--dry-run` and `-y/--yes`.
 
-Full reference: [docs/cli](docs/cli/oc_precheck.md).
+Full reference: [docs/cli](docs/cli/oc_upkit.md).
 
 ## Checks
 
@@ -177,9 +177,9 @@ On a hosted cluster (HCP guest), `etcd` and `mcp` are skipped. Off a hub,
 ## Configuration
 
 ```bash
-oc precheck config default > precheck.yaml          # start from the defaults
-oc precheck config validate --config precheck.yaml  # exit code 3 when invalid
-oc precheck --config precheck.yaml                  # or OCP_PRECHECK_CONFIG=precheck.yaml
+oc upkit config default > upkit.yaml          # start from the defaults
+oc upkit config validate --config upkit.yaml  # exit code 3 when invalid
+oc upkit --config upkit.yaml                  # or UPKIT_CONFIG=upkit.yaml
 ```
 
 Precedence: built-in defaults < configuration file < command-line flags.
@@ -207,27 +207,27 @@ the whole list (`aggregate: true`). They can use `params`, `now`,
 `clusterVersion`, and the CEL strings, lists, sets and math libraries.
 
 - Reference: [docs/configuration.md](docs/configuration.md).
-- Annotated example: [examples/precheck.yaml](examples/precheck.yaml).
+- Annotated example: [examples/upkit.yaml](examples/upkit.yaml).
 
 ## Typical maintenance workflow
 
 ```bash
 # Before
-oc precheck --config precheck.yaml --target-version 4.18.24
-oc precheck --silence --silence-duration 4h \
+oc upkit --config upkit.yaml --target-version 4.18.24
+oc upkit --silence --silence-duration 4h \
             --banner "Upgrade to 4.18 in progress — CHG0012345" --banner-link https://itsm.example.com/CHG0012345 \
             --defrag --dry-run
-oc precheck --silence --banner "Upgrade to 4.18 in progress" --defrag --yes
+oc upkit --silence --banner "Upgrade to 4.18 in progress" --defrag --yes
 
 # During
 oc adm upgrade --to=4.18.24
-oc precheck watch
+oc upkit watch
 
 # After
-oc precheck                         # everything green again?
-oc precheck silence list            # UUIDs of the active silences
-oc precheck silence expire <UUID>
-oc precheck banner remove --all
+oc upkit                         # everything green again?
+oc upkit silence list            # UUIDs of the active silences
+oc upkit silence expire <UUID>
+oc upkit banner remove --all
 ```
 
 The full runbook is [docs/operations.md](docs/operations.md). It covers
@@ -236,10 +236,10 @@ draining a room and the HyperShift hub workflow.
 ### Draining a room
 
 ```bash
-oc precheck drain -l topology.kubernetes.io/zone=room-a --dry-run     # analysis only
-oc precheck drain -l topology.kubernetes.io/zone=room-a --delete-emptydir-data --parallel 2
-oc precheck watch -l topology.kubernetes.io/zone=room-a
-oc precheck uncordon -l topology.kubernetes.io/zone=room-a
+oc upkit drain -l topology.kubernetes.io/zone=room-a --dry-run     # analysis only
+oc upkit drain -l topology.kubernetes.io/zone=room-a --delete-emptydir-data --parallel 2
+oc upkit watch -l topology.kubernetes.io/zone=room-a
+oc upkit uncordon -l topology.kubernetes.io/zone=room-a
 ```
 
 Before changing anything, the drain shows:

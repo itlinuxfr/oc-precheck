@@ -1,20 +1,11 @@
-## oc precheck banner
+## oc upkit config
 
-Manage the web console banner (ConsoleNotification)
-
-### Examples
-
-```
-  oc precheck banner set --text "Upgrade to 4.18 in progress — CHG0012345" --link https://itsm.example.com/CHG0012345
-  oc precheck banner list
-  oc precheck banner remove
-  oc precheck banner remove --all
-```
+Generate or validate a configuration file
 
 ### Options
 
 ```
-  -h, --help   help for banner
+  -h, --help   help for config
 ```
 
 ### Options inherited from parent commands
@@ -27,7 +18,7 @@ Manage the web console banner (ConsoleNotification)
       --client-certificate string      Path to a client certificate file for TLS
       --client-key string              Path to a client key file for TLS
       --cluster string                 The name of the kubeconfig cluster to use
-      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $OCP_PRECHECK_CONFIG
+      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $UPKIT_CONFIG
       --context string                 The name of the kubeconfig context to use
       --disable-compression            If true, opt-out of response compression for all requests to the server
       --insecure-skip-tls-verify       If true, the server's certificate will not be checked for validity. This will make your HTTPS connections insecure
@@ -49,8 +40,7 @@ Manage the web console banner (ConsoleNotification)
 
 ### SEE ALSO
 
-* [oc precheck](oc_precheck.md)	 - Pre-upgrade checks and maintenance operations for OpenShift 4
-* [oc precheck banner list](oc_precheck_banner_list.md)	 - List the banners
-* [oc precheck banner remove](oc_precheck_banner_remove.md)	 - Remove banners (default: oc-precheck-maintenance)
-* [oc precheck banner set](oc_precheck_banner_set.md)	 - Create or update a banner
+* [oc upkit](oc_upkit.md)	 - Upgrade toolkit for OpenShift 4: pre-upgrade checks and maintenance operations
+* [oc upkit config default](oc_upkit_config_default.md)	 - Print the default configuration (every setting and rule with its default value)
+* [oc upkit config validate](oc_upkit_config_validate.md)	 - Validate a configuration file (exit code 3 when invalid)
 

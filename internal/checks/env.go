@@ -1,4 +1,4 @@
-// Copyright 2026 The oc-precheck Authors.
+// Copyright 2026 The oc-upkit Authors.
 // SPDX-License-Identifier: Apache-2.0
 
 // Package checks implements the pre-upgrade checks, the rule policy
@@ -21,8 +21,8 @@ import (
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/itlinuxfr/oc-precheck/internal/kube"
-	"github.com/itlinuxfr/oc-precheck/internal/report"
+	"github.com/itlinuxfr/oc-upkit/internal/kube"
+	"github.com/itlinuxfr/oc-upkit/internal/report"
 )
 
 // Env gives checks access to the cluster. Interfaces keep it testable with

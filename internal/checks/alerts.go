@@ -1,4 +1,4 @@
-// Copyright 2026 The oc-precheck Authors.
+// Copyright 2026 The oc-upkit Authors.
 // SPDX-License-Identifier: Apache-2.0
 
 package checks
@@ -14,7 +14,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/itlinuxfr/oc-precheck/internal/report"
+	"github.com/itlinuxfr/oc-upkit/internal/report"
 )
 
 // amAlert is the subset of `amtool alert query -o json` used here.
@@ -242,7 +242,7 @@ func CheckSilences(ctx context.Context, env *Env, o *Options) *report.Section {
 			r.add("silences.match-all", "", x.ID, "Silence %s mutes ALL alerts until %s", x.ID, x.EndsAt.Local().Format("2006-01-02 15:04"))
 		}
 	}
-	s.Summary = fmt.Sprintf("%d active silence(s) — expire them after the maintenance: oc precheck silence expire <UUID>", len(sil))
+	s.Summary = fmt.Sprintf("%d active silence(s) — expire them after the maintenance: oc upkit silence expire <UUID>", len(sil))
 	r.done()
 	return s
 }
@@ -288,7 +288,7 @@ func ActionSilence(ctx context.Context, env *Env, o *Options, so SilenceOptions)
 	}
 	id := strings.TrimSpace(out)
 	s.Add(report.Pass, "Silence created — UUID: %s", id)
-	s.Add(report.Info, "To expire it: oc precheck silence expire %s", id)
+	s.Add(report.Info, "To expire it: oc upkit silence expire %s", id)
 	return s
 }
 
