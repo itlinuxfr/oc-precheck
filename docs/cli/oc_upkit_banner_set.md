@@ -1,31 +1,23 @@
-## oc precheck rules
+## oc upkit banner set
 
-List the rules with their default and effective severity
-
-### Synopsis
-
-List every rule (built-in and custom) with its default severity and, when
---config is given, its effective severity. Rule IDs are what the configuration
-file uses in "severities" and "exclusions".
+Create or update a banner
 
 ```
-oc precheck rules [flags]
-```
-
-### Examples
-
-```
-  oc precheck rules
-  oc precheck rules --check pods
-  oc precheck rules --config precheck.yaml
+oc upkit banner set [flags]
 ```
 
 ### Options
 
 ```
-      --check string   Only list the rules of this check
-  -h, --help           help for rules
-      --markdown       Render as a Markdown table
+      --bg string          Background color (e.g. #c9190b red, #f0ab00 orange, #0066cc blue) (default "#c9190b")
+      --color string       Text color (default "#fff")
+      --dry-run            Show what would be done without changing anything
+  -h, --help               help for set
+      --link string        Optional link
+      --link-text string   Link text
+      --location string    BannerTop, BannerBottom or BannerTopBottom (default "BannerTop")
+      --name string        ConsoleNotification name (default "oc-upkit-maintenance")
+  -t, --text string        Banner text (required)
 ```
 
 ### Options inherited from parent commands
@@ -38,7 +30,7 @@ oc precheck rules [flags]
       --client-certificate string      Path to a client certificate file for TLS
       --client-key string              Path to a client key file for TLS
       --cluster string                 The name of the kubeconfig cluster to use
-      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $OCP_PRECHECK_CONFIG
+      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $UPKIT_CONFIG
       --context string                 The name of the kubeconfig context to use
       --disable-compression            If true, opt-out of response compression for all requests to the server
       --insecure-skip-tls-verify       If true, the server's certificate will not be checked for validity. This will make your HTTPS connections insecure
@@ -60,5 +52,5 @@ oc precheck rules [flags]
 
 ### SEE ALSO
 
-* [oc precheck](oc_precheck.md)	 - Pre-upgrade checks and maintenance operations for OpenShift 4
+* [oc upkit banner](oc_upkit_banner.md)	 - Manage the web console banner (ConsoleNotification)
 

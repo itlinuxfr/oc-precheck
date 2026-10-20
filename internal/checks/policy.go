@@ -1,4 +1,4 @@
-// Copyright 2026 The oc-precheck Authors.
+// Copyright 2026 The oc-upkit Authors.
 // SPDX-License-Identifier: Apache-2.0
 
 package checks
@@ -9,7 +9,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/itlinuxfr/oc-precheck/internal/report"
+	"github.com/itlinuxfr/oc-upkit/internal/report"
 )
 
 // RuleInfo documents a built-in rule.
@@ -216,7 +216,7 @@ func (p *Policy) Validate() error {
 		}
 		if _, ok := catalogIndex[k]; !ok {
 			if _, ok := p.custom[k]; !ok {
-				return fmt.Errorf("severities: unknown rule %q (see `oc precheck rules`)", k)
+				return fmt.Errorf("severities: unknown rule %q (see `oc upkit rules`)", k)
 			}
 		}
 	}

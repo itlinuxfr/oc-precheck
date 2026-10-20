@@ -1,15 +1,24 @@
-## oc precheck banner list
+## oc upkit uncordon
 
-List the banners
+Make the nodes matching a label selector schedulable again
 
 ```
-oc precheck banner list [flags]
+oc upkit uncordon [flags]
+```
+
+### Examples
+
+```
+  oc upkit uncordon -l topology.kubernetes.io/zone=room-a
 ```
 
 ### Options
 
 ```
-  -h, --help   help for list
+      --dry-run           Show what would be done without changing anything
+  -h, --help              help for uncordon
+  -l, --selector string   Label selector of the nodes (required)
+  -y, --yes               Do not ask for confirmation
 ```
 
 ### Options inherited from parent commands
@@ -22,7 +31,7 @@ oc precheck banner list [flags]
       --client-certificate string      Path to a client certificate file for TLS
       --client-key string              Path to a client key file for TLS
       --cluster string                 The name of the kubeconfig cluster to use
-      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $OCP_PRECHECK_CONFIG
+      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $UPKIT_CONFIG
       --context string                 The name of the kubeconfig context to use
       --disable-compression            If true, opt-out of response compression for all requests to the server
       --insecure-skip-tls-verify       If true, the server's certificate will not be checked for validity. This will make your HTTPS connections insecure
@@ -44,5 +53,5 @@ oc precheck banner list [flags]
 
 ### SEE ALSO
 
-* [oc precheck banner](oc_precheck_banner.md)	 - Manage the web console banner (ConsoleNotification)
+* [oc upkit](oc_upkit.md)	 - Upgrade toolkit for OpenShift 4: pre-upgrade checks and maintenance operations
 

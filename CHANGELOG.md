@@ -6,6 +6,23 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+- **Renamed from `oc-precheck` to `oc-upkit`**: the tool now covers the whole
+  upgrade (checks and maintenance operations), not only pre-checks. Install the
+  binary as `oc-upkit` / `kubectl-upkit` and run `oc upkit`. Module path:
+  `github.com/itlinuxfr/oc-upkit`.
+- Configuration: `UPKIT_CONFIG` replaces `OCP_PRECHECK_CONFIG`, and the example
+  file is now `upkit.yaml`.
+- Web console banners and Alertmanager silences are now marked `oc-upkit`.
+
+### Deprecated
+- `OCP_PRECHECK_CONFIG` is still read, with a warning, and will be removed in
+  a future release.
+
+### Fixed
+- `banner remove --all` also removes the banners created by `oc-precheck`
+  before the rename.
+
 ## [0.3.0] - 2026-10-19
 
 ### Added

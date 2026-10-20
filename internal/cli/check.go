@@ -1,4 +1,4 @@
-// Copyright 2026 The oc-precheck Authors.
+// Copyright 2026 The oc-upkit Authors.
 // SPDX-License-Identifier: Apache-2.0
 
 package cli
@@ -13,8 +13,8 @@ import (
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/api/resource"
 
-	"github.com/itlinuxfr/oc-precheck/internal/checks"
-	"github.com/itlinuxfr/oc-precheck/internal/report"
+	"github.com/itlinuxfr/oc-upkit/internal/checks"
+	"github.com/itlinuxfr/oc-upkit/internal/report"
 )
 
 type checkOptions struct {
@@ -54,8 +54,8 @@ configuration error, 4 execution error.`,
 		Example: g.example(
 			"$CMD",
 			"$CMD check --checks etcd,mcp,pdb --verbose",
-			"$CMD --config precheck.yaml --target-version 4.18.24",
-			"$CMD --group-by-label topology.kubernetes.io/zone -o json > precheck.json",
+			"$CMD --config upkit.yaml --target-version 4.18.24",
+			"$CMD --group-by-label topology.kubernetes.io/zone -o json > upkit.json",
 			`$CMD --silence --banner "Upgrade to 4.18 in progress" --defrag --dry-run`,
 		),
 		Args: cobra.NoArgs,
@@ -91,7 +91,7 @@ configuration error, 4 execution error.`,
 
 	f.BoolVar(&co.silence, "silence", false, "ACTION: create an Alertmanager silence for the maintenance window")
 	f.DurationVar(&co.silenceDuration, "silence-duration", 3*time.Hour, "Silence duration")
-	f.StringVar(&co.silenceComment, "silence-comment", "OpenShift upgrade in progress (oc-precheck)", "Silence comment")
+	f.StringVar(&co.silenceComment, "silence-comment", "OpenShift upgrade in progress (oc-upkit)", "Silence comment")
 	f.StringVar(&co.silenceAuthor, "silence-author", "", "Silence author (default: current OS user)")
 	f.StringArrayVar(&co.silenceMatchers, "silence-matcher", nil, "amtool matcher (repeatable), default alertname=~.+ (everything)")
 	f.StringVar(&co.banner.Text, "banner", "", "ACTION: show this text as a web console banner")
@@ -101,7 +101,7 @@ configuration error, 4 execution error.`,
 	f.StringVar(&co.banner.Background, "banner-bg", "#c9190b", "Banner background color")
 	f.StringVar(&co.banner.LinkURL, "banner-link", "", "Optional link (e.g. change ticket)")
 	f.StringVar(&co.banner.LinkText, "banner-link-text", "", "Link text")
-	f.BoolVar(&co.removeBanner, "remove-banner", false, "ACTION: remove the banners created by oc-precheck (end of maintenance)")
+	f.BoolVar(&co.removeBanner, "remove-banner", false, "ACTION: remove the banners created by oc-upkit (end of maintenance)")
 	f.BoolVar(&co.defrag, "defrag", false, "ACTION: defragment etcd, leader last")
 	f.Float64Var(&co.do.MinFragmentation, "defrag-min-frag", 0, "Only defragment members above this fragmentation (%)")
 	f.DurationVar(&co.do.Pause, "defrag-pause", 15*time.Second, "Pause between two members")
@@ -155,7 +155,7 @@ func runCheck(cmd *cobra.Command, g *globals, co *checkOptions) error {
 		return err
 	}
 	defer ss.cancel()
-	ss.header("oc-precheck — OpenShift pre-upgrade checks")
+	ss.header("oc-upkit — OpenShift pre-upgrade checks")
 	if g.text() {
 		fmt.Fprintf(g.streams.ErrOut, "Running %d check(s)…\n\n", len(selected))
 	}
@@ -197,7 +197,7 @@ func runCheck(cmd *cobra.Command, g *globals, co *checkOptions) error {
 		plan = append(plan, fmt.Sprintf("show the console banner %q", co.banner.Text))
 	}
 	if co.removeBanner {
-		plan = append(plan, "remove the console banners created by oc-precheck")
+		plan = append(plan, "remove the console banners created by oc-upkit")
 	}
 	if co.defrag {
 		plan = append(plan, "defragment etcd member by member (leader last)")

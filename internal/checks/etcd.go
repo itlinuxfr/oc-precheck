@@ -1,4 +1,4 @@
-// Copyright 2026 The oc-precheck Authors.
+// Copyright 2026 The oc-upkit Authors.
 // SPDX-License-Identifier: Apache-2.0
 
 package checks
@@ -16,7 +16,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/itlinuxfr/oc-precheck/internal/report"
+	"github.com/itlinuxfr/oc-upkit/internal/report"
 )
 
 // etcdctl v3.5 JSON shapes (`-w json`).
@@ -317,7 +317,7 @@ func CheckEtcd(ctx context.Context, env *Env, o *Options) *report.Section {
 		r.add("etcd.alarm", ns, "", "Active etcd alarm: %s", a)
 	}
 	if len(defragNeeded) > 0 {
-		r.add("etcd.fragmentation", ns, "", "Defragmentation recommended (≥ %.0f%% reclaimable): %s — see `oc precheck defrag`",
+		r.add("etcd.fragmentation", ns, "", "Defragmentation recommended (≥ %.0f%% reclaimable): %s — see `oc upkit defrag`",
 			o.EtcdFragThreshold, strings.Join(defragNeeded, ", "))
 	}
 	s.Add(report.Info, "Take an etcd backup (cluster-backup.sh) right before the upgrade and store it outside the cluster")

@@ -1,20 +1,17 @@
-## oc precheck silence add
+## oc upkit completion
 
-Create a silence (default: every alert)
+Generate the autocompletion script for the specified shell
 
-```
-oc precheck silence add [flags]
-```
+### Synopsis
+
+Generate the autocompletion script for oc-upkit for the specified shell.
+See each sub-command's help for details on how to use the generated script.
+
 
 ### Options
 
 ```
-      --author string         Author (default: current OS user)
-      --comment string        Comment (default "OpenShift maintenance (oc-precheck)")
-      --dry-run               Show what would be done
-      --duration duration     Silence duration (default 3h0m0s)
-  -h, --help                  help for add
-      --matcher stringArray   amtool matcher (repeatable), default alertname=~.+ (everything)
+  -h, --help   help for completion
 ```
 
 ### Options inherited from parent commands
@@ -27,13 +24,12 @@ oc precheck silence add [flags]
       --client-certificate string      Path to a client certificate file for TLS
       --client-key string              Path to a client key file for TLS
       --cluster string                 The name of the kubeconfig cluster to use
-      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $OCP_PRECHECK_CONFIG
+      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $UPKIT_CONFIG
       --context string                 The name of the kubeconfig context to use
       --disable-compression            If true, opt-out of response compression for all requests to the server
       --insecure-skip-tls-verify       If true, the server's certificate will not be checked for validity. This will make your HTTPS connections insecure
       --kubeconfig string              Path to the kubeconfig file (default: $KUBECONFIG, then ~/.kube/config)
       --max-rows int                   Maximum rows per table (0 = unlimited) (default 50)
-      --monitoring-namespace string    Namespace of the platform monitoring stack (default "openshift-monitoring")
       --no-color                       Disable colors (also honors NO_COLOR)
   -o, --output string                  Output format: text, json or yaml (default "text")
       --password string                Password for basic authentication to the API server
@@ -50,5 +46,9 @@ oc precheck silence add [flags]
 
 ### SEE ALSO
 
-* [oc precheck silence](oc_precheck_silence.md)	 - Manage Alertmanager silences (shown with their UUID)
+* [oc upkit](oc_upkit.md)	 - Upgrade toolkit for OpenShift 4: pre-upgrade checks and maintenance operations
+* [oc upkit completion bash](oc_upkit_completion_bash.md)	 - Generate the autocompletion script for bash
+* [oc upkit completion fish](oc_upkit_completion_fish.md)	 - Generate the autocompletion script for fish
+* [oc upkit completion powershell](oc_upkit_completion_powershell.md)	 - Generate the autocompletion script for powershell
+* [oc upkit completion zsh](oc_upkit_completion_zsh.md)	 - Generate the autocompletion script for zsh
 

@@ -1,4 +1,4 @@
-// Copyright 2026 The oc-precheck Authors.
+// Copyright 2026 The oc-upkit Authors.
 // SPDX-License-Identifier: Apache-2.0
 
 package checks
@@ -13,7 +13,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
-	"github.com/itlinuxfr/oc-precheck/internal/report"
+	"github.com/itlinuxfr/oc-upkit/internal/report"
 )
 
 // WatchOptions configures the live view.

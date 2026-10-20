@@ -1,22 +1,22 @@
-# ClusterRoles for oc-precheck.
+# ClusterRoles for oc-upkit.
 #
 #   oc apply -f examples/rbac.yaml
-#   oc adm policy add-cluster-role-to-user oc-precheck-reader <user>
-#   oc adm policy add-cluster-role-to-user oc-precheck-operator <user>
+#   oc adm policy add-cluster-role-to-user oc-upkit-reader <user>
+#   oc adm policy add-cluster-role-to-user oc-upkit-operator <user>
 #
-# oc-precheck-reader:   the read-only checks (no pods/exec: alerts, silences
+# oc-upkit-reader:   the read-only checks (no pods/exec: alerts, silences
 #                       and etcd will report ERROR)
-# oc-precheck-operator: everything, including pods/exec in the monitoring and
+# oc-upkit-operator: everything, including pods/exec in the monitoring and
 #                       etcd namespaces, cordon/drain and console banners.
 #
-# Grant oc-precheck-operator only to the people who run maintenances.
+# Grant oc-upkit-operator only to the people who run maintenances.
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: oc-precheck-reader
+  name: oc-upkit-reader
   labels:
-    app.kubernetes.io/name: oc-precheck
+    app.kubernetes.io/name: oc-upkit
 rules:
   - apiGroups: [""]
     resources: [nodes, pods, resourcequotas, persistentvolumeclaims]
@@ -58,23 +58,23 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: oc-precheck-operator
+  name: oc-upkit-operator
   labels:
-    app.kubernetes.io/name: oc-precheck
+    app.kubernetes.io/name: oc-upkit
 aggregationRule:
   clusterRoleSelectors:
     - matchLabels:
-        oc-precheck.io/aggregate-to-operator: "true"
+        oc-upkit.io/aggregate-to-operator: "true"
 rules: []
 ---
 # Read access is aggregated into the operator role.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: oc-precheck-operator-read
+  name: oc-upkit-operator-read
   labels:
-    app.kubernetes.io/name: oc-precheck
-    oc-precheck.io/aggregate-to-operator: "true"
+    app.kubernetes.io/name: oc-upkit
+    oc-upkit.io/aggregate-to-operator: "true"
 rules:
   - apiGroups: ["", policy, batch, certificates.k8s.io, config.openshift.io, operator.openshift.io,
                 machineconfiguration.openshift.io, operators.coreos.com, quota.openshift.io,
@@ -88,10 +88,10 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: oc-precheck-operator-write
+  name: oc-upkit-operator-write
   labels:
-    app.kubernetes.io/name: oc-precheck
-    oc-precheck.io/aggregate-to-operator: "true"
+    app.kubernetes.io/name: oc-upkit
+    oc-upkit.io/aggregate-to-operator: "true"
 rules:
   # alerts, silences (amtool) and etcd / defrag (etcdctl). ClusterRoles cannot
   # be scoped to namespaces: bind this rule with RoleBindings in

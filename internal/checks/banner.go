@@ -1,4 +1,4 @@
-// Copyright 2026 The oc-precheck Authors.
+// Copyright 2026 The oc-upkit Authors.
 // SPDX-License-Identifier: Apache-2.0
 
 package checks
@@ -12,14 +12,18 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
-	"github.com/itlinuxfr/oc-precheck/internal/report"
+	"github.com/itlinuxfr/oc-upkit/internal/report"
 )
 
 // Banner defaults.
 const (
-	DefaultBannerName = "oc-precheck-maintenance"
+	DefaultBannerName = "oc-upkit-maintenance"
 	managedByLabel    = "app.kubernetes.io/managed-by"
-	managedByValue    = "oc-precheck"
+	managedByValue    = "oc-upkit"
+
+	// Label value of the former oc-precheck name, still recognized so that
+	// banners created before the rename are removed by "banner remove --all".
+	legacyManagedByValue = "oc-precheck"
 )
 
 // BannerOptions configures a ConsoleNotification (web console banner).
@@ -96,7 +100,7 @@ func ActionBanner(ctx context.Context, env *Env, bo BannerOptions) *report.Secti
 	default:
 		return s.Fail(err, "")
 	}
-	s.Add(report.Info, "To remove it: oc precheck banner remove --name %s", bo.Name)
+	s.Add(report.Info, "To remove it: oc upkit banner remove --name %s", bo.Name)
 	return s
 }
 
@@ -106,7 +110,8 @@ func ActionRemoveBanner(ctx context.Context, env *Env, names []string, all, dryR
 	s := report.NewSection("banner-remove", "Action: remove web console banner(s)")
 	res := env.Dyn.Resource(gvrConsoleNotif)
 	if all {
-		list, err := res.List(ctx, metav1.ListOptions{LabelSelector: managedByLabel + "=" + managedByValue})
+		selector := fmt.Sprintf("%s in (%s,%s)", managedByLabel, managedByValue, legacyManagedByValue)
+		list, err := res.List(ctx, metav1.ListOptions{LabelSelector: selector})
 		if err != nil {
 			return s.Fail(err, "")
 		}
@@ -114,8 +119,9 @@ func ActionRemoveBanner(ctx context.Context, env *Env, names []string, all, dryR
 		for _, n := range list.Items {
 			names = append(names, n.GetName())
 		}
+		sort.Strings(names)
 		if len(names) == 0 {
-			s.Summary = "No banner created by oc-precheck"
+			s.Summary = "No banner created by oc-upkit"
 			return s
 		}
 	}

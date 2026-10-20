@@ -5,7 +5,7 @@
 *.test
 
 # Local configuration and reports
-/precheck.yaml
+/upkit.yaml
 *.json.out
 
 # Editors / OS

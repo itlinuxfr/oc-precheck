@@ -1,4 +1,4 @@
-// Copyright 2026 The oc-precheck Authors.
+// Copyright 2026 The oc-upkit Authors.
 // SPDX-License-Identifier: Apache-2.0
 
 // Package kube builds Kubernetes clients from the standard kubeconfig
@@ -21,7 +21,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/remotecommand"
 
-	"github.com/itlinuxfr/oc-precheck/internal/version"
+	"github.com/itlinuxfr/oc-upkit/internal/version"
 )
 
 // Executor runs a command inside a container and returns stdout/stderr.
@@ -77,7 +77,7 @@ func (f *Flags) New() (*Client, error) {
 	}
 	cfg.QPS = 50
 	cfg.Burst = 100
-	cfg.UserAgent = "oc-precheck/" + version.Get().Version
+	cfg.UserAgent = "oc-upkit/" + version.Get().Version
 
 	cs, err := kubernetes.NewForConfig(cfg)
 	if err != nil {

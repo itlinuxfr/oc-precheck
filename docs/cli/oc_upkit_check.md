@@ -1,4 +1,4 @@
-## oc precheck check
+## oc upkit check
 
 Run the pre-upgrade checks (default command)
 
@@ -14,17 +14,17 @@ Exit codes: 0 OK, 1 warnings (with --fail-on warn), 2 critical, 3 usage or
 configuration error, 4 execution error.
 
 ```
-oc precheck check [flags]
+oc upkit check [flags]
 ```
 
 ### Examples
 
 ```
-  oc precheck
-  oc precheck check --checks etcd,mcp,pdb --verbose
-  oc precheck --config precheck.yaml --target-version 4.18.24
-  oc precheck --group-by-label topology.kubernetes.io/zone -o json > precheck.json
-  oc precheck --silence --banner "Upgrade to 4.18 in progress" --defrag --dry-run
+  oc upkit
+  oc upkit check --checks etcd,mcp,pdb --verbose
+  oc upkit --config upkit.yaml --target-version 4.18.24
+  oc upkit --group-by-label topology.kubernetes.io/zone -o json > upkit.json
+  oc upkit --silence --banner "Upgrade to 4.18 in progress" --defrag --dry-run
 ```
 
 ### Options
@@ -38,7 +38,7 @@ oc precheck check [flags]
       --banner-link string                Optional link (e.g. change ticket)
       --banner-link-text string           Link text
       --banner-location string            BannerTop, BannerBottom or BannerTopBottom (default "BannerTop")
-      --banner-name string                ConsoleNotification name (default "oc-precheck-maintenance")
+      --banner-name string                ConsoleNotification name (default "oc-upkit-maintenance")
       --checks strings                    Checks to run (default: all), see --list-checks
       --defrag                            ACTION: defragment etcd, leader last
       --defrag-command-timeout duration   Timeout of etcdctl defrag (default 1m0s)
@@ -67,10 +67,10 @@ oc precheck check [flags]
       --pod-restart-warn int32            Restart count reported as information (default 10)
       --pod-terminating-age duration      Report pods Terminating for longer than this (default 10m0s)
       --quota-threshold float             Quota usage (%) above which to warn (default 90)
-      --remove-banner                     ACTION: remove the banners created by oc-precheck (end of maintenance)
+      --remove-banner                     ACTION: remove the banners created by oc-upkit (end of maintenance)
       --silence                           ACTION: create an Alertmanager silence for the maintenance window
       --silence-author string             Silence author (default: current OS user)
-      --silence-comment string            Silence comment (default "OpenShift upgrade in progress (oc-precheck)")
+      --silence-comment string            Silence comment (default "OpenShift upgrade in progress (oc-upkit)")
       --silence-duration duration         Silence duration (default 3h0m0s)
       --silence-matcher stringArray       amtool matcher (repeatable), default alertname=~.+ (everything)
       --skip strings                      Checks to skip
@@ -89,7 +89,7 @@ oc precheck check [flags]
       --client-certificate string      Path to a client certificate file for TLS
       --client-key string              Path to a client key file for TLS
       --cluster string                 The name of the kubeconfig cluster to use
-      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $OCP_PRECHECK_CONFIG
+      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $UPKIT_CONFIG
       --context string                 The name of the kubeconfig context to use
       --disable-compression            If true, opt-out of response compression for all requests to the server
       --insecure-skip-tls-verify       If true, the server's certificate will not be checked for validity. This will make your HTTPS connections insecure
@@ -111,5 +111,5 @@ oc precheck check [flags]
 
 ### SEE ALSO
 
-* [oc precheck](oc_precheck.md)	 - Pre-upgrade checks and maintenance operations for OpenShift 4
+* [oc upkit](oc_upkit.md)	 - Upgrade toolkit for OpenShift 4: pre-upgrade checks and maintenance operations
 

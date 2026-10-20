@@ -1,17 +1,21 @@
-## oc precheck completion
+## oc upkit config validate
 
-Generate the autocompletion script for the specified shell
+Validate a configuration file (exit code 3 when invalid)
 
-### Synopsis
+```
+oc upkit config validate [flags]
+```
 
-Generate the autocompletion script for oc-precheck for the specified shell.
-See each sub-command's help for details on how to use the generated script.
+### Examples
 
+```
+  oc upkit config validate --config upkit.yaml
+```
 
 ### Options
 
 ```
-  -h, --help   help for completion
+  -h, --help   help for validate
 ```
 
 ### Options inherited from parent commands
@@ -24,7 +28,7 @@ See each sub-command's help for details on how to use the generated script.
       --client-certificate string      Path to a client certificate file for TLS
       --client-key string              Path to a client key file for TLS
       --cluster string                 The name of the kubeconfig cluster to use
-      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $OCP_PRECHECK_CONFIG
+      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $UPKIT_CONFIG
       --context string                 The name of the kubeconfig context to use
       --disable-compression            If true, opt-out of response compression for all requests to the server
       --insecure-skip-tls-verify       If true, the server's certificate will not be checked for validity. This will make your HTTPS connections insecure
@@ -46,9 +50,5 @@ See each sub-command's help for details on how to use the generated script.
 
 ### SEE ALSO
 
-* [oc precheck](oc_precheck.md)	 - Pre-upgrade checks and maintenance operations for OpenShift 4
-* [oc precheck completion bash](oc_precheck_completion_bash.md)	 - Generate the autocompletion script for bash
-* [oc precheck completion fish](oc_precheck_completion_fish.md)	 - Generate the autocompletion script for fish
-* [oc precheck completion powershell](oc_precheck_completion_powershell.md)	 - Generate the autocompletion script for powershell
-* [oc precheck completion zsh](oc_precheck_completion_zsh.md)	 - Generate the autocompletion script for zsh
+* [oc upkit config](oc_upkit_config.md)	 - Generate or validate a configuration file
 

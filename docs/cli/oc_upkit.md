@@ -1,34 +1,18 @@
-## oc precheck completion fish
+## oc upkit
 
-Generate the autocompletion script for fish
+Upgrade toolkit for OpenShift 4: pre-upgrade checks and maintenance operations
 
 ### Synopsis
 
-Generate the autocompletion script for the fish shell.
+oc-upkit verifies that an OpenShift 4 cluster is ready to be upgraded and
+helps run the maintenance around it: Alertmanager silences, web console banner,
+etcd defragmentation, drain of a whole room / zone, live node view, and a global
+status of HostedClusters from a HyperShift hub.
 
-To load completions in your current shell session:
-
-	oc-precheck completion fish | source
-
-To load completions for every new session, execute once:
-
-	oc-precheck completion fish > ~/.config/fish/completions/oc-precheck.fish
-
-You will need to start a new shell for this setup to take effect.
-
-
-```
-oc precheck completion fish [flags]
-```
+Running it without a command runs "check". It works as an oc / kubectl plugin
+when installed as "oc-upkit" or "kubectl-upkit" in the PATH.
 
 ### Options
-
-```
-  -h, --help              help for fish
-      --no-descriptions   disable completion descriptions
-```
-
-### Options inherited from parent commands
 
 ```
       --as string                      Username to impersonate for the operation
@@ -38,9 +22,10 @@ oc precheck completion fish [flags]
       --client-certificate string      Path to a client certificate file for TLS
       --client-key string              Path to a client key file for TLS
       --cluster string                 The name of the kubeconfig cluster to use
-      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $OCP_PRECHECK_CONFIG
+      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $UPKIT_CONFIG
       --context string                 The name of the kubeconfig context to use
       --disable-compression            If true, opt-out of response compression for all requests to the server
+  -h, --help                           help for oc upkit
       --insecure-skip-tls-verify       If true, the server's certificate will not be checked for validity. This will make your HTTPS connections insecure
       --kubeconfig string              Path to the kubeconfig file (default: $KUBECONFIG, then ~/.kube/config)
       --max-rows int                   Maximum rows per table (0 = unlimited) (default 50)
@@ -60,5 +45,15 @@ oc precheck completion fish [flags]
 
 ### SEE ALSO
 
-* [oc precheck completion](oc_precheck_completion.md)	 - Generate the autocompletion script for the specified shell
+* [oc upkit banner](oc_upkit_banner.md)	 - Manage the web console banner (ConsoleNotification)
+* [oc upkit check](oc_upkit_check.md)	 - Run the pre-upgrade checks (default command)
+* [oc upkit completion](oc_upkit_completion.md)	 - Generate the autocompletion script for the specified shell
+* [oc upkit config](oc_upkit_config.md)	 - Generate or validate a configuration file
+* [oc upkit defrag](oc_upkit_defrag.md)	 - Defragment etcd member by member, leader last
+* [oc upkit drain](oc_upkit_drain.md)	 - Drain every node matching a label selector (e.g. a whole room)
+* [oc upkit rules](oc_upkit_rules.md)	 - List the rules with their default and effective severity
+* [oc upkit silence](oc_upkit_silence.md)	 - Manage Alertmanager silences (shown with their UUID)
+* [oc upkit uncordon](oc_upkit_uncordon.md)	 - Make the nodes matching a label selector schedulable again
+* [oc upkit version](oc_upkit_version.md)	 - Print the version
+* [oc upkit watch](oc_upkit_watch.md)	 - Live view of nodes, MachineConfigPools and HostedClusters
 

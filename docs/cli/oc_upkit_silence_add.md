@@ -1,28 +1,20 @@
-## oc precheck completion powershell
+## oc upkit silence add
 
-Generate the autocompletion script for powershell
-
-### Synopsis
-
-Generate the autocompletion script for powershell.
-
-To load completions in your current shell session:
-
-	oc-precheck completion powershell | Out-String | Invoke-Expression
-
-To load completions for every new session, add the output of the above command
-to your powershell profile.
-
+Create a silence (default: every alert)
 
 ```
-oc precheck completion powershell [flags]
+oc upkit silence add [flags]
 ```
 
 ### Options
 
 ```
-  -h, --help              help for powershell
-      --no-descriptions   disable completion descriptions
+      --author string         Author (default: current OS user)
+      --comment string        Comment (default "OpenShift maintenance (oc-upkit)")
+      --dry-run               Show what would be done
+      --duration duration     Silence duration (default 3h0m0s)
+  -h, --help                  help for add
+      --matcher stringArray   amtool matcher (repeatable), default alertname=~.+ (everything)
 ```
 
 ### Options inherited from parent commands
@@ -35,12 +27,13 @@ oc precheck completion powershell [flags]
       --client-certificate string      Path to a client certificate file for TLS
       --client-key string              Path to a client key file for TLS
       --cluster string                 The name of the kubeconfig cluster to use
-      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $OCP_PRECHECK_CONFIG
+      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $UPKIT_CONFIG
       --context string                 The name of the kubeconfig context to use
       --disable-compression            If true, opt-out of response compression for all requests to the server
       --insecure-skip-tls-verify       If true, the server's certificate will not be checked for validity. This will make your HTTPS connections insecure
       --kubeconfig string              Path to the kubeconfig file (default: $KUBECONFIG, then ~/.kube/config)
       --max-rows int                   Maximum rows per table (0 = unlimited) (default 50)
+      --monitoring-namespace string    Namespace of the platform monitoring stack (default "openshift-monitoring")
       --no-color                       Disable colors (also honors NO_COLOR)
   -o, --output string                  Output format: text, json or yaml (default "text")
       --password string                Password for basic authentication to the API server
@@ -57,5 +50,5 @@ oc precheck completion powershell [flags]
 
 ### SEE ALSO
 
-* [oc precheck completion](oc_precheck_completion.md)	 - Generate the autocompletion script for the specified shell
+* [oc upkit silence](oc_upkit_silence.md)	 - Manage Alertmanager silences (shown with their UUID)
 

@@ -1,15 +1,31 @@
-## oc precheck silence list
+## oc upkit rules
 
-List active silences
+List the rules with their default and effective severity
+
+### Synopsis
+
+List every rule (built-in and custom) with its default severity and, when
+--config is given, its effective severity. Rule IDs are what the configuration
+file uses in "severities" and "exclusions".
 
 ```
-oc precheck silence list [flags]
+oc upkit rules [flags]
+```
+
+### Examples
+
+```
+  oc upkit rules
+  oc upkit rules --check pods
+  oc upkit rules --config upkit.yaml
 ```
 
 ### Options
 
 ```
-  -h, --help   help for list
+      --check string   Only list the rules of this check
+  -h, --help           help for rules
+      --markdown       Render as a Markdown table
 ```
 
 ### Options inherited from parent commands
@@ -22,13 +38,12 @@ oc precheck silence list [flags]
       --client-certificate string      Path to a client certificate file for TLS
       --client-key string              Path to a client key file for TLS
       --cluster string                 The name of the kubeconfig cluster to use
-      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $OCP_PRECHECK_CONFIG
+      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $UPKIT_CONFIG
       --context string                 The name of the kubeconfig context to use
       --disable-compression            If true, opt-out of response compression for all requests to the server
       --insecure-skip-tls-verify       If true, the server's certificate will not be checked for validity. This will make your HTTPS connections insecure
       --kubeconfig string              Path to the kubeconfig file (default: $KUBECONFIG, then ~/.kube/config)
       --max-rows int                   Maximum rows per table (0 = unlimited) (default 50)
-      --monitoring-namespace string    Namespace of the platform monitoring stack (default "openshift-monitoring")
       --no-color                       Disable colors (also honors NO_COLOR)
   -o, --output string                  Output format: text, json or yaml (default "text")
       --password string                Password for basic authentication to the API server
@@ -45,5 +60,5 @@ oc precheck silence list [flags]
 
 ### SEE ALSO
 
-* [oc precheck silence](oc_precheck_silence.md)	 - Manage Alertmanager silences (shown with their UUID)
+* [oc upkit](oc_upkit.md)	 - Upgrade toolkit for OpenShift 4: pre-upgrade checks and maintenance operations
 

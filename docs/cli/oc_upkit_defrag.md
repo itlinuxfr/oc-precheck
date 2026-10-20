@@ -1,18 +1,38 @@
-## oc precheck
+## oc upkit defrag
 
-Pre-upgrade checks and maintenance operations for OpenShift 4
+Defragment etcd member by member, leader last
 
 ### Synopsis
 
-oc-precheck verifies that an OpenShift 4 cluster is ready to be upgraded and
-helps run the maintenance around it: Alertmanager silences, web console banner,
-etcd defragmentation, drain of a whole room / zone, live node view, and a global
-status of HostedClusters from a HyperShift hub.
+Defragment etcd one member at a time: followers first, leader last. The
+operation is refused when a member is unhealthy, and cluster health is checked
+again after each member.
 
-Running it without a command runs "check". It works as an oc / kubectl plugin
-when installed as "oc-precheck" or "kubectl-precheck" in the PATH.
+```
+oc upkit defrag [flags]
+```
+
+### Examples
+
+```
+  oc upkit defrag --dry-run
+  oc upkit defrag --min-frag 30 --yes
+```
 
 ### Options
+
+```
+      --command-timeout duration   Timeout of etcdctl defrag (default 1m0s)
+      --disarm-alarms              Disarm etcd alarms (NOSPACE) after defragmentation
+      --dry-run                    Show what would be done without changing anything
+      --etcd-namespace string      Namespace of the etcd pods (default "openshift-etcd")
+  -h, --help                       help for defrag
+      --min-frag float             Only defragment members above this fragmentation (%)
+      --pause duration             Pause between two members (default 15s)
+  -y, --yes                        Do not ask for confirmation
+```
+
+### Options inherited from parent commands
 
 ```
       --as string                      Username to impersonate for the operation
@@ -22,10 +42,9 @@ when installed as "oc-precheck" or "kubectl-precheck" in the PATH.
       --client-certificate string      Path to a client certificate file for TLS
       --client-key string              Path to a client key file for TLS
       --cluster string                 The name of the kubeconfig cluster to use
-      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $OCP_PRECHECK_CONFIG
+      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $UPKIT_CONFIG
       --context string                 The name of the kubeconfig context to use
       --disable-compression            If true, opt-out of response compression for all requests to the server
-  -h, --help                           help for oc precheck
       --insecure-skip-tls-verify       If true, the server's certificate will not be checked for validity. This will make your HTTPS connections insecure
       --kubeconfig string              Path to the kubeconfig file (default: $KUBECONFIG, then ~/.kube/config)
       --max-rows int                   Maximum rows per table (0 = unlimited) (default 50)
@@ -45,15 +64,5 @@ when installed as "oc-precheck" or "kubectl-precheck" in the PATH.
 
 ### SEE ALSO
 
-* [oc precheck banner](oc_precheck_banner.md)	 - Manage the web console banner (ConsoleNotification)
-* [oc precheck check](oc_precheck_check.md)	 - Run the pre-upgrade checks (default command)
-* [oc precheck completion](oc_precheck_completion.md)	 - Generate the autocompletion script for the specified shell
-* [oc precheck config](oc_precheck_config.md)	 - Generate or validate a configuration file
-* [oc precheck defrag](oc_precheck_defrag.md)	 - Defragment etcd member by member, leader last
-* [oc precheck drain](oc_precheck_drain.md)	 - Drain every node matching a label selector (e.g. a whole room)
-* [oc precheck rules](oc_precheck_rules.md)	 - List the rules with their default and effective severity
-* [oc precheck silence](oc_precheck_silence.md)	 - Manage Alertmanager silences (shown with their UUID)
-* [oc precheck uncordon](oc_precheck_uncordon.md)	 - Make the nodes matching a label selector schedulable again
-* [oc precheck version](oc_precheck_version.md)	 - Print the version
-* [oc precheck watch](oc_precheck_watch.md)	 - Live view of nodes, MachineConfigPools and HostedClusters
+* [oc upkit](oc_upkit.md)	 - Upgrade toolkit for OpenShift 4: pre-upgrade checks and maintenance operations
 

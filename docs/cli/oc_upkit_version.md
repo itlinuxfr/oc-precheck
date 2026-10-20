@@ -1,35 +1,15 @@
-## oc precheck defrag
+## oc upkit version
 
-Defragment etcd member by member, leader last
-
-### Synopsis
-
-Defragment etcd one member at a time: followers first, leader last. The
-operation is refused when a member is unhealthy, and cluster health is checked
-again after each member.
+Print the version
 
 ```
-oc precheck defrag [flags]
-```
-
-### Examples
-
-```
-  oc precheck defrag --dry-run
-  oc precheck defrag --min-frag 30 --yes
+oc upkit version [flags]
 ```
 
 ### Options
 
 ```
-      --command-timeout duration   Timeout of etcdctl defrag (default 1m0s)
-      --disarm-alarms              Disarm etcd alarms (NOSPACE) after defragmentation
-      --dry-run                    Show what would be done without changing anything
-      --etcd-namespace string      Namespace of the etcd pods (default "openshift-etcd")
-  -h, --help                       help for defrag
-      --min-frag float             Only defragment members above this fragmentation (%)
-      --pause duration             Pause between two members (default 15s)
-  -y, --yes                        Do not ask for confirmation
+  -h, --help   help for version
 ```
 
 ### Options inherited from parent commands
@@ -42,7 +22,7 @@ oc precheck defrag [flags]
       --client-certificate string      Path to a client certificate file for TLS
       --client-key string              Path to a client key file for TLS
       --cluster string                 The name of the kubeconfig cluster to use
-      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $OCP_PRECHECK_CONFIG
+      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $UPKIT_CONFIG
       --context string                 The name of the kubeconfig context to use
       --disable-compression            If true, opt-out of response compression for all requests to the server
       --insecure-skip-tls-verify       If true, the server's certificate will not be checked for validity. This will make your HTTPS connections insecure
@@ -64,5 +44,5 @@ oc precheck defrag [flags]
 
 ### SEE ALSO
 
-* [oc precheck](oc_precheck.md)	 - Pre-upgrade checks and maintenance operations for OpenShift 4
+* [oc upkit](oc_upkit.md)	 - Upgrade toolkit for OpenShift 4: pre-upgrade checks and maintenance operations
 

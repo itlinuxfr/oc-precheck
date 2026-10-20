@@ -1,23 +1,31 @@
-## oc precheck banner set
+## oc upkit completion fish
 
-Create or update a banner
+Generate the autocompletion script for fish
+
+### Synopsis
+
+Generate the autocompletion script for the fish shell.
+
+To load completions in your current shell session:
+
+	oc-upkit completion fish | source
+
+To load completions for every new session, execute once:
+
+	oc-upkit completion fish > ~/.config/fish/completions/oc-upkit.fish
+
+You will need to start a new shell for this setup to take effect.
+
 
 ```
-oc precheck banner set [flags]
+oc upkit completion fish [flags]
 ```
 
 ### Options
 
 ```
-      --bg string          Background color (e.g. #c9190b red, #f0ab00 orange, #0066cc blue) (default "#c9190b")
-      --color string       Text color (default "#fff")
-      --dry-run            Show what would be done without changing anything
-  -h, --help               help for set
-      --link string        Optional link
-      --link-text string   Link text
-      --location string    BannerTop, BannerBottom or BannerTopBottom (default "BannerTop")
-      --name string        ConsoleNotification name (default "oc-precheck-maintenance")
-  -t, --text string        Banner text (required)
+  -h, --help              help for fish
+      --no-descriptions   disable completion descriptions
 ```
 
 ### Options inherited from parent commands
@@ -30,7 +38,7 @@ oc precheck banner set [flags]
       --client-certificate string      Path to a client certificate file for TLS
       --client-key string              Path to a client key file for TLS
       --cluster string                 The name of the kubeconfig cluster to use
-      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $OCP_PRECHECK_CONFIG
+      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $UPKIT_CONFIG
       --context string                 The name of the kubeconfig context to use
       --disable-compression            If true, opt-out of response compression for all requests to the server
       --insecure-skip-tls-verify       If true, the server's certificate will not be checked for validity. This will make your HTTPS connections insecure
@@ -52,5 +60,5 @@ oc precheck banner set [flags]
 
 ### SEE ALSO
 
-* [oc precheck banner](oc_precheck_banner.md)	 - Manage the web console banner (ConsoleNotification)
+* [oc upkit completion](oc_upkit_completion.md)	 - Generate the autocompletion script for the specified shell
 

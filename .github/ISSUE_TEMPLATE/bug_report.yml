@@ -18,8 +18,8 @@ body:
   - type: input
     id: version
     attributes:
-      label: oc-precheck version
-      description: Output of `oc precheck version`
+      label: oc-upkit version
+      description: Output of `oc upkit version`
     validations:
       required: true
   - type: input

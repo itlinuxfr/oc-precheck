@@ -1,4 +1,4 @@
-// Copyright 2026 The oc-precheck Authors.
+// Copyright 2026 The oc-upkit Authors.
 // SPDX-License-Identifier: Apache-2.0
 
 package cli
@@ -16,7 +16,7 @@ import (
 func run(t *testing.T, args ...string) (string, string, error) {
 	t.Helper()
 	var out, errOut bytes.Buffer
-	root := NewRootCommand(IOStreams{In: strings.NewReader(""), Out: &out, ErrOut: &errOut}, "oc-precheck")
+	root := NewRootCommand(IOStreams{In: strings.NewReader(""), Out: &out, ErrOut: &errOut}, "oc-upkit")
 	root.SetArgs(defaultToCheck(root, args))
 	err := root.Execute()
 	return out.String(), errOut.String(), err
@@ -35,9 +35,9 @@ func exitCode(err error) int {
 
 func TestCommandName(t *testing.T) {
 	cases := map[string]string{
-		"/usr/local/bin/oc-precheck":   "oc precheck",
-		"kubectl-precheck":             "kubectl precheck",
-		`C:\tools\oc-precheck.exe`:     "oc precheck",
+		"/usr/local/bin/oc-upkit":      "oc upkit",
+		"kubectl-upkit":                "kubectl upkit",
+		`C:\tools\oc-upkit.exe`:        "oc upkit",
 		"/opt/bin/oc-upgrade_precheck": "oc upgrade-precheck",
 		"./my-build":                   "my-build",
 	}
@@ -49,7 +49,7 @@ func TestCommandName(t *testing.T) {
 }
 
 func TestDefaultToCheck(t *testing.T) {
-	root := NewRootCommand(IOStreams{Out: &bytes.Buffer{}, ErrOut: &bytes.Buffer{}}, "oc-precheck")
+	root := NewRootCommand(IOStreams{Out: &bytes.Buffer{}, ErrOut: &bytes.Buffer{}}, "oc-upkit")
 	cases := []struct {
 		in   []string
 		want string
@@ -77,7 +77,7 @@ func TestConfigDefaultAndValidate(t *testing.T) {
 		t.Fatalf("unexpected default config:\n%s", out)
 	}
 	dir := t.TempDir()
-	path := filepath.Join(dir, "precheck.yaml")
+	path := filepath.Join(dir, "upkit.yaml")
 	if _, _, err := run(t, "config", "default", "--output-file", path); err != nil {
 		t.Fatal(err)
 	}
@@ -95,13 +95,13 @@ func TestConfigDefaultAndValidate(t *testing.T) {
 	if _, _, err := run(t, "config", "validate", "--config", bad); exitCode(err) != CodeUsage || !strings.Contains(err.Error(), "pdb.blocked") {
 		t.Fatalf("invalid config must exit 3, got %v", err)
 	}
-	if _, _, err := run(t, "config", "validate", "--config", "../../examples/precheck.yaml"); err != nil {
+	if _, _, err := run(t, "config", "validate", "--config", "../../examples/upkit.yaml"); err != nil {
 		t.Fatalf("example config: %v", err)
 	}
 }
 
 func TestRulesCommand(t *testing.T) {
-	out, _, err := run(t, "rules", "-o", "json", "--config", "../../examples/precheck.yaml")
+	out, _, err := run(t, "rules", "-o", "json", "--config", "../../examples/upkit.yaml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -139,12 +139,12 @@ func TestUsageErrors(t *testing.T) {
 
 func TestPluginHelpUsesDisplayName(t *testing.T) {
 	var out bytes.Buffer
-	root := NewRootCommand(IOStreams{In: strings.NewReader(""), Out: &out, ErrOut: &out}, "/usr/bin/oc-precheck")
+	root := NewRootCommand(IOStreams{In: strings.NewReader(""), Out: &out, ErrOut: &out}, "/usr/bin/oc-upkit")
 	root.SetArgs([]string{"drain", "--help"})
 	if err := root.Execute(); err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(out.String(), "oc precheck drain") {
+	if !strings.Contains(out.String(), "oc upkit drain") {
 		t.Fatalf("help should show the plugin name:\n%s", out.String())
 	}
 }

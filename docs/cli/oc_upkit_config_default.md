@@ -1,15 +1,29 @@
-## oc precheck version
+## oc upkit config default
 
-Print the version
+Print the default configuration (every setting and rule with its default value)
+
+### Synopsis
+
+Print the default configuration as YAML: every setting with its default value,
+every rule with its default severity, and commented examples of exclusions and
+custom CEL rules. It is generated from the code and always up to date.
 
 ```
-oc precheck version [flags]
+oc upkit config default [flags]
+```
+
+### Examples
+
+```
+  oc upkit config default > upkit.yaml
+  oc upkit config default --output-file upkit.yaml
 ```
 
 ### Options
 
 ```
-  -h, --help   help for version
+  -h, --help                 help for default
+  -f, --output-file string   Write to this file instead of stdout (never overwrites)
 ```
 
 ### Options inherited from parent commands
@@ -22,7 +36,7 @@ oc precheck version [flags]
       --client-certificate string      Path to a client certificate file for TLS
       --client-key string              Path to a client key file for TLS
       --cluster string                 The name of the kubeconfig cluster to use
-      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $OCP_PRECHECK_CONFIG
+      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $UPKIT_CONFIG
       --context string                 The name of the kubeconfig context to use
       --disable-compression            If true, opt-out of response compression for all requests to the server
       --insecure-skip-tls-verify       If true, the server's certificate will not be checked for validity. This will make your HTTPS connections insecure
@@ -44,5 +58,5 @@ oc precheck version [flags]
 
 ### SEE ALSO
 
-* [oc precheck](oc_precheck.md)	 - Pre-upgrade checks and maintenance operations for OpenShift 4
+* [oc upkit config](oc_upkit_config.md)	 - Generate or validate a configuration file
 

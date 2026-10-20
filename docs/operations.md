@@ -1,15 +1,15 @@
 # Operations runbook
 
-This page describes how oc-precheck fits in an OpenShift upgrade and in a
-datacenter maintenance. Commands are shown as `oc precheck`; use
-`oc-precheck` if the binary is not installed as a plugin.
+This page describes how oc-upkit fits in an OpenShift upgrade and in a
+datacenter maintenance. Commands are shown as `oc upkit`; use
+`oc-upkit` if the binary is not installed as a plugin.
 
 ## 1. Cluster upgrade
 
 ### Days before
 
 ```bash
-oc precheck --config precheck.yaml --target-version 4.18.24
+oc upkit --config upkit.yaml --target-version 4.18.24
 ```
 
 - Fix every `CRIT`. Review the `WARN`: paused pools, blocking PDBs, quotas at
@@ -28,14 +28,14 @@ oc precheck --config precheck.yaml --target-version 4.18.24
    ```
 2. Run a dry run of the preparation actions:
    ```bash
-   oc precheck --silence --silence-duration 4h \
+   oc upkit --silence --silence-duration 4h \
                --banner "Upgrade to 4.18 in progress — CHG0012345" \
                --banner-link https://itsm.example.com/CHG0012345 \
                --defrag --dry-run
    ```
 3. Then run them for real:
    ```bash
-   oc precheck --silence --silence-duration 4h --banner "Upgrade to 4.18 in progress" --defrag --yes
+   oc upkit --silence --silence-duration 4h --banner "Upgrade to 4.18 in progress" --defrag --yes
    ```
 
 What the actions do:
@@ -51,8 +51,8 @@ What the actions do:
 
 ```bash
 oc adm upgrade --to=4.18.24
-oc precheck watch                 # Ctrl-C to quit
-oc precheck watch --problems      # only nodes that are not nominal
+oc upkit watch                 # Ctrl-C to quit
+oc upkit watch --problems      # only nodes that are not nominal
 ```
 
 The live view shows:
@@ -66,10 +66,10 @@ The live view shows:
 ### After
 
 ```bash
-oc precheck --config precheck.yaml
-oc precheck silence list            # UUIDs of the active silences
-oc precheck silence expire <UUID>
-oc precheck banner remove --all     # every banner created by oc-precheck
+oc upkit --config upkit.yaml
+oc upkit silence list            # UUIDs of the active silences
+oc upkit silence expire <UUID>
+oc upkit banner remove --all     # every banner created by oc-upkit
 ```
 
 `--remove-banner` does the same as part of a `check` run.
@@ -78,7 +78,7 @@ oc precheck banner remove --all     # every banner created by oc-precheck
 
 ```bash
 # 1. Analysis only
-oc precheck drain -l topology.kubernetes.io/zone=room-a --dry-run
+oc upkit drain -l topology.kubernetes.io/zone=room-a --dry-run
 ```
 
 The analysis shows:
@@ -106,13 +106,13 @@ The drain is refused when:
 
 ```bash
 # 2. Execute
-oc precheck drain -l topology.kubernetes.io/zone=room-a --delete-emptydir-data --parallel 2
+oc upkit drain -l topology.kubernetes.io/zone=room-a --delete-emptydir-data --parallel 2
 
 # 3. Follow
-oc precheck watch -l topology.kubernetes.io/zone=room-a
+oc upkit watch -l topology.kubernetes.io/zone=room-a
 
 # 4. After the maintenance
-oc precheck uncordon -l topology.kubernetes.io/zone=room-a
+oc upkit uncordon -l topology.kubernetes.io/zone=room-a
 ```
 
 Every target node is **cordoned first**, so that evicted pods do not land on
@@ -143,9 +143,9 @@ gives a global status per HostedCluster:
 | ACM | `ManagedClusterConditionAvailable` of the ManagedCluster with the same name |
 
 ```bash
-oc precheck --checks hostedclusters
-oc precheck --checks hostedclusters --hcp-filter 'prod-*'
-oc precheck watch --hcp-filter 'prod-*'      # follow a control plane / NodePool upgrade
+oc upkit --checks hostedclusters
+oc upkit --checks hostedclusters --hcp-filter 'prod-*'
+oc upkit watch --hcp-filter 'prod-*'      # follow a control plane / NodePool upgrade
 ```
 
 On a hosted (guest) cluster, the `etcd` and `mcp` checks are skipped. Their
@@ -154,7 +154,7 @@ equivalents live on the hub.
 ## 4. CI / automation
 
 ```bash
-oc precheck --config precheck.yaml -o json > precheck.json
+oc upkit --config upkit.yaml -o json > upkit.json
 echo "exit code: $?"    # 0 OK, 1 warnings (--fail-on warn), 2 critical, 3 usage, 4 error
 ```
 

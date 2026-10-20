@@ -1,4 +1,4 @@
-// Copyright 2026 The oc-precheck Authors.
+// Copyright 2026 The oc-upkit Authors.
 // SPDX-License-Identifier: Apache-2.0
 
 package cli
@@ -13,8 +13,8 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
 
-	"github.com/itlinuxfr/oc-precheck/internal/checks"
-	"github.com/itlinuxfr/oc-precheck/internal/report"
+	"github.com/itlinuxfr/oc-upkit/internal/checks"
+	"github.com/itlinuxfr/oc-upkit/internal/report"
 )
 
 // -------------------------------------------------------------- watch
@@ -130,7 +130,7 @@ blocking pods remain or when the remaining capacity looks insufficient.`,
 				return err
 			}
 			defer ss.cancel()
-			ss.header("oc-precheck — drain")
+			ss.header("oc-upkit — drain")
 			plan := checks.PlanDrain(ss.ctx, ss.env, g.o, do)
 			ss.add(plan.Section)
 			switch {
@@ -260,7 +260,7 @@ func newBannerCommand(g *globals) *cobra.Command {
 		},
 	}
 	remove.Flags().StringSliceVar(&names, "name", nil, "Banner name(s) to remove")
-	remove.Flags().BoolVar(&all, "all", false, "Remove every banner created by oc-precheck")
+	remove.Flags().BoolVar(&all, "all", false, "Remove every banner created by oc-upkit")
 	remove.Flags().BoolVar(&rmDry, "dry-run", false, "Show what would be removed")
 
 	list := &cobra.Command{
@@ -325,7 +325,7 @@ func newSilenceCommand(g *globals) *cobra.Command {
 	}
 	af := add.Flags()
 	af.DurationVar(&so.Duration, "duration", 3*time.Hour, "Silence duration")
-	af.StringVar(&so.Comment, "comment", "OpenShift maintenance (oc-precheck)", "Comment")
+	af.StringVar(&so.Comment, "comment", "OpenShift maintenance (oc-upkit)", "Comment")
 	af.StringVar(&so.Author, "author", "", "Author (default: current OS user)")
 	af.StringArrayVar(&so.Matchers, "matcher", nil, "amtool matcher (repeatable), default alertname=~.+ (everything)")
 	af.BoolVar(&so.DryRun, "dry-run", false, "Show what would be done")
@@ -366,7 +366,7 @@ again after each member.`,
 				return err
 			}
 			defer ss.cancel()
-			ss.header("oc-precheck — etcd defragmentation")
+			ss.header("oc-upkit — etcd defragmentation")
 			ss.add(checks.CheckEtcd(ss.ctx, ss.env, g.o))
 			if !act.dryRun && !act.yes && !g.confirm(fmt.Sprintf("Cluster %s: defragment etcd?", ss.kc.Context)) {
 				return nil

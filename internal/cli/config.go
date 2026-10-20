@@ -1,4 +1,4 @@
-// Copyright 2026 The oc-precheck Authors.
+// Copyright 2026 The oc-upkit Authors.
 // SPDX-License-Identifier: Apache-2.0
 
 package cli
@@ -15,9 +15,9 @@ import (
 	"github.com/spf13/cobra/doc"
 	"sigs.k8s.io/yaml"
 
-	"github.com/itlinuxfr/oc-precheck/internal/checks"
-	"github.com/itlinuxfr/oc-precheck/internal/report"
-	"github.com/itlinuxfr/oc-precheck/internal/version"
+	"github.com/itlinuxfr/oc-upkit/internal/checks"
+	"github.com/itlinuxfr/oc-upkit/internal/report"
+	"github.com/itlinuxfr/oc-upkit/internal/version"
 )
 
 // -------------------------------------------------------------- rules
@@ -61,7 +61,7 @@ func newRulesCommand(g *globals) *cobra.Command {
 		Long: `List every rule (built-in and custom) with its default severity and, when
 --config is given, its effective severity. Rule IDs are what the configuration
 file uses in "severities" and "exclusions".`,
-		Example: g.example("$CMD rules", "$CMD rules --check pods", "$CMD rules --config precheck.yaml"),
+		Example: g.example("$CMD rules", "$CMD rules --check pods", "$CMD rules --config upkit.yaml"),
 		Args:    cobra.NoArgs,
 		RunE: func(_ *cobra.Command, _ []string) error {
 			rows := ruleRows(g.o, check)
@@ -123,7 +123,7 @@ func newConfigCommand(g *globals) *cobra.Command {
 		Long: `Print the default configuration as YAML: every setting with its default value,
 every rule with its default severity, and commented examples of exclusions and
 custom CEL rules. It is generated from the code and always up to date.`,
-		Example: g.example("$CMD config default > precheck.yaml", "$CMD config default --output-file precheck.yaml"),
+		Example: g.example("$CMD config default > upkit.yaml", "$CMD config default --output-file upkit.yaml"),
 		Args:    cobra.NoArgs,
 		RunE: func(_ *cobra.Command, _ []string) error {
 			content := checks.DefaultConfigYAML()
@@ -146,7 +146,7 @@ custom CEL rules. It is generated from the code and always up to date.`,
 	validate := &cobra.Command{
 		Use:     "validate",
 		Short:   "Validate a configuration file (exit code 3 when invalid)",
-		Example: g.example("$CMD config validate --config precheck.yaml"),
+		Example: g.example("$CMD config validate --config upkit.yaml"),
 		Args:    cobra.NoArgs,
 		RunE: func(_ *cobra.Command, _ []string) error {
 			if g.configPath == "" {

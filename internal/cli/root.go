@@ -1,4 +1,4 @@
-// Copyright 2026 The oc-precheck Authors.
+// Copyright 2026 The oc-upkit Authors.
 // SPDX-License-Identifier: Apache-2.0
 
 // Package cli implements the command-line interface (cobra commands).
@@ -21,11 +21,15 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
 
-	"github.com/itlinuxfr/oc-precheck/internal/checks"
-	"github.com/itlinuxfr/oc-precheck/internal/kube"
-	"github.com/itlinuxfr/oc-precheck/internal/report"
-	"github.com/itlinuxfr/oc-precheck/internal/version"
+	"github.com/itlinuxfr/oc-upkit/internal/checks"
+	"github.com/itlinuxfr/oc-upkit/internal/kube"
+	"github.com/itlinuxfr/oc-upkit/internal/report"
+	"github.com/itlinuxfr/oc-upkit/internal/version"
 )
+
+// legacyConfigEnv is the configuration variable of the former oc-precheck
+// name, still read for one release.
+const legacyConfigEnv = "OCP_PRECHECK_CONFIG"
 
 // Exit codes.
 const (
@@ -72,11 +76,11 @@ type globals struct {
 	timeout    time.Duration
 	o          *checks.Options
 	cfg        *checks.Config
-	name       string // command name as displayed in help (oc precheck…)
+	name       string // command name as displayed in help (oc upkit…)
 }
 
-// commandName returns how the user invoked the tool: "oc precheck" or
-// "kubectl precheck" when run as a plugin, the binary name otherwise.
+// commandName returns how the user invoked the tool: "oc upkit" or
+// "kubectl upkit" when run as a plugin, the binary name otherwise.
 func commandName(argv0 string) string {
 	// Handle both separators: the binary may be invoked from Windows.
 	base := strings.TrimSuffix(path.Base(strings.ReplaceAll(argv0, `\`, "/")), ".exe")
@@ -86,7 +90,7 @@ func commandName(argv0 string) string {
 		}
 	}
 	if base == "" || base == "." {
-		return "oc-precheck"
+		return "oc-upkit"
 	}
 	return base
 }
@@ -95,15 +99,15 @@ func commandName(argv0 string) string {
 func NewRootCommand(streams IOStreams, argv0 string) *cobra.Command {
 	g := &globals{streams: streams, kube: kube.NewFlags(), o: checks.DefaultOptions(), name: commandName(argv0)}
 	root := &cobra.Command{
-		Use:   "oc-precheck",
-		Short: "Pre-upgrade checks and maintenance operations for OpenShift 4",
-		Long: `oc-precheck verifies that an OpenShift 4 cluster is ready to be upgraded and
+		Use:   "oc-upkit",
+		Short: "Upgrade toolkit for OpenShift 4: pre-upgrade checks and maintenance operations",
+		Long: `oc-upkit verifies that an OpenShift 4 cluster is ready to be upgraded and
 helps run the maintenance around it: Alertmanager silences, web console banner,
 etcd defragmentation, drain of a whole room / zone, live node view, and a global
 status of HostedClusters from a HyperShift hub.
 
 Running it without a command runs "check". It works as an oc / kubectl plugin
-when installed as "oc-precheck" or "kubectl-precheck" in the PATH.`,
+when installed as "oc-upkit" or "kubectl-upkit" in the PATH.`,
 		Version:       version.Get().Version,
 		SilenceUsage:  true,
 		SilenceErrors: true,
@@ -119,7 +123,7 @@ when installed as "oc-precheck" or "kubectl-precheck" in the PATH.`,
 
 	pf := root.PersistentFlags()
 	g.kube.AddFlags(pf)
-	pf.StringVar(&g.configPath, "config", "", "Configuration file (rules, thresholds, exclusions); defaults to $OCP_PRECHECK_CONFIG")
+	pf.StringVar(&g.configPath, "config", "", "Configuration file (rules, thresholds, exclusions); defaults to $UPKIT_CONFIG")
 	pf.StringVarP(&g.output, "output", "o", "text", "Output format: text, json or yaml")
 	pf.BoolVar(&g.noColor, "no-color", false, "Disable colors (also honors NO_COLOR)")
 	pf.BoolVar(&g.o.Verbose, "verbose", false, "Also show healthy items")
@@ -164,7 +168,7 @@ func Execute() int {
 }
 
 // defaultToCheck inserts "check" when no sub-command is given, so that
-// `oc precheck --target-version 4.18.24` runs the checks.
+// `oc upkit --target-version 4.18.24` runs the checks.
 func defaultToCheck(root *cobra.Command, args []string) []string {
 	names := map[string]bool{"help": true, "completion": true, "__complete": true, "__completeNoDesc": true}
 	for _, c := range root.Commands() {
@@ -189,7 +193,13 @@ func (g *globals) loadConfig(cmd *cobra.Command) error {
 		return usageError("--output must be text, json or yaml")
 	}
 	if g.configPath == "" {
-		g.configPath = os.Getenv("OCP_PRECHECK_CONFIG")
+		g.configPath = os.Getenv("UPKIT_CONFIG")
+	}
+	if g.configPath == "" {
+		if v := os.Getenv(legacyConfigEnv); v != "" {
+			fmt.Fprintf(g.streams.ErrOut, "warning: %s is deprecated, use UPKIT_CONFIG instead\n", legacyConfigEnv)
+			g.configPath = v
+		}
 	}
 	if g.configPath == "" {
 		return nil
@@ -322,9 +332,9 @@ func authorOrDefault(author string) string {
 		return author
 	}
 	if u, err := user.Current(); err == nil && u.Username != "" {
-		return u.Username + " (oc-precheck)"
+		return u.Username + " (oc-upkit)"
 	}
-	return "oc-precheck"
+	return "oc-upkit"
 }
 
 // example formats examples with the displayed command name.

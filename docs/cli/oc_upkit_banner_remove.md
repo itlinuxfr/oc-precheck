@@ -1,49 +1,18 @@
-## oc precheck drain
+## oc upkit banner remove
 
-Drain every node matching a label selector (e.g. a whole room)
-
-### Synopsis
-
-Drain a set of nodes selected by label, typically a whole room / availability
-zone. A pre-flight analysis is shown first: pods to evict, blocking pods (no
-controller, emptyDir), affected PodDisruptionBudgets and remaining capacity per
-zone. All target nodes are cordoned first (so that pods do not land in the same
-room), then drained through the eviction API: PodDisruptionBudgets are honored
-and evictions retried; DaemonSet and static pods are ignored.
-
-The drain is refused when the selection contains control plane nodes, when
-blocking pods remain or when the remaining capacity looks insufficient.
+Remove banners (default: oc-upkit-maintenance)
 
 ```
-oc precheck drain [flags]
-```
-
-### Examples
-
-```
-  oc precheck drain --selector topology.kubernetes.io/zone=room-a --dry-run
-  oc precheck drain -l topology.kubernetes.io/zone=room-a --parallel 2 --delete-emptydir-data
-  oc precheck drain -l example.com/room=dc1-a --cordon-only
-  oc precheck uncordon -l topology.kubernetes.io/zone=room-a
+oc upkit banner remove [NAME...] [flags]
 ```
 
 ### Options
 
 ```
-      --cordon-only             Cordon without draining
-      --delete-emptydir-data    Accept losing emptyDir volumes
-      --dry-run                 Show what would be done without changing anything
-      --force                   Delete pods without a controller (they will not be recreated)
-      --grace-period int        Pod grace period in seconds (-1 = the pod's own value) (default -1)
-  -h, --help                    help for drain
-      --include-control-plane   Allow control plane nodes in the selection
-      --node-timeout duration   Maximum drain duration per node (default 30m0s)
-      --parallel int            Number of nodes drained at the same time (default 1)
-      --pod-parallel int        Concurrent evictions per node (default 5)
-  -l, --selector string         Label selector of the nodes to drain (required)
-      --skip-capacity-check     Proceed even if the remaining capacity looks insufficient
-  -y, --yes                     Do not ask for confirmation
-      --zone-label string       Node label holding the zone / room (default "topology.kubernetes.io/zone")
+      --all            Remove every banner created by oc-upkit
+      --dry-run        Show what would be removed
+  -h, --help           help for remove
+      --name strings   Banner name(s) to remove
 ```
 
 ### Options inherited from parent commands
@@ -56,7 +25,7 @@ oc precheck drain [flags]
       --client-certificate string      Path to a client certificate file for TLS
       --client-key string              Path to a client key file for TLS
       --cluster string                 The name of the kubeconfig cluster to use
-      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $OCP_PRECHECK_CONFIG
+      --config string                  Configuration file (rules, thresholds, exclusions); defaults to $UPKIT_CONFIG
       --context string                 The name of the kubeconfig context to use
       --disable-compression            If true, opt-out of response compression for all requests to the server
       --insecure-skip-tls-verify       If true, the server's certificate will not be checked for validity. This will make your HTTPS connections insecure
@@ -78,5 +47,5 @@ oc precheck drain [flags]
 
 ### SEE ALSO
 
-* [oc precheck](oc_precheck.md)	 - Pre-upgrade checks and maintenance operations for OpenShift 4
+* [oc upkit banner](oc_upkit_banner.md)	 - Manage the web console banner (ConsoleNotification)
 

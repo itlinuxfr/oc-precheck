@@ -1,9 +1,9 @@
-# Example oc-precheck configuration for a production cluster.
+# Example oc-upkit configuration for a production cluster.
 #
-#   oc precheck --config examples/precheck.yaml
-#   oc precheck config validate --config examples/precheck.yaml
+#   oc upkit --config examples/upkit.yaml
+#   oc upkit config validate --config examples/upkit.yaml
 #
-# Start from the full list of defaults with: oc precheck config default
+# Start from the full list of defaults with: oc upkit config default
 
 settings:
   failOn: crit
