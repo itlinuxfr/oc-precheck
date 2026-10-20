@@ -148,3 +148,36 @@ func TestPluginHelpUsesDisplayName(t *testing.T) {
 		t.Fatalf("help should show the plugin name:\n%s", out.String())
 	}
 }
+
+func TestRunListAndPrint(t *testing.T) {
+	out, _, err := run(t, "run")
+	if err != nil || !strings.Contains(out, "pre-upgrade") || !strings.Contains(out, "post-upgrade") {
+		t.Fatalf("list: %v\n%s", err, out)
+	}
+	out, _, err = run(t, "run", "pre-upgrade", "--print")
+	if err != nil || !strings.HasPrefix(out, "# Prepare an OpenShift cluster") || !strings.Contains(out, "- defrag: {}") {
+		t.Fatalf("print: %v\n%s", err, out)
+	}
+	// The printed scenario can be saved and run as a file.
+	p := filepath.Join(t.TempDir(), "mine.yaml")
+	if err := os.WriteFile(p, []byte(out), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if again, _, err := run(t, "run", p, "--print"); err != nil || again != out {
+		t.Fatalf("print file: %v", err)
+	}
+}
+
+func TestRunInvalidScenario(t *testing.T) {
+	if _, _, err := run(t, "run", "nope"); exitCode(err) != CodeUsage || !strings.Contains(err.Error(), "neither a built-in") {
+		t.Fatalf("unknown scenario: %v", err)
+	}
+	p := filepath.Join(t.TempDir(), "bad.yaml")
+	if err := os.WriteFile(p, []byte("name: bad\nsteps:\n- check: {checks: [etcdd]}\n- banner: {}\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	_, _, err := run(t, "run", p)
+	if exitCode(err) != CodeUsage || !strings.Contains(err.Error(), `unknown check "etcdd"`) || !strings.Contains(err.Error(), "banner text") {
+		t.Fatalf("invalid scenario: %v", err)
+	}
+}

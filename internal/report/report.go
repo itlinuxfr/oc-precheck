@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"time"
 	"unicode/utf8"
 
 	"sigs.k8s.io/yaml"
@@ -155,8 +156,44 @@ type Report struct {
 	Context  string            `json:"context,omitempty"`
 	Server   string            `json:"server,omitempty"`
 	Meta     map[string]string `json:"meta,omitempty"`
+	Scenario *ScenarioRun      `json:"scenario,omitempty"`
 	Sections []*Section        `json:"sections"`
 	Status   Level             `json:"status"`
+}
+
+// Scenario outcomes.
+const (
+	OutcomeCompleted = "completed" // every step ran
+	OutcomeStopped   = "stopped"   // a gate stopped the run (critical or failed step)
+	OutcomeDeclined  = "declined"  // the operator answered no to a confirmation
+	OutcomeCanceled  = "canceled"  // the run was interrupted (signal, timeout)
+	OutcomePlanned   = "planned"   // dry run: nothing was executed
+)
+
+// ScenarioRun records the execution of a scenario: who ran it, when, and
+// what each step did. Steps point to their sections by index.
+type ScenarioRun struct {
+	Name       string     `json:"name"`
+	Source     string     `json:"source"`
+	User       string     `json:"user,omitempty"`
+	Tool       string     `json:"tool,omitempty"`
+	StartedAt  time.Time  `json:"startedAt"`
+	FinishedAt time.Time  `json:"finishedAt"`
+	Outcome    string     `json:"outcome"`
+	Reason     string     `json:"reason,omitempty"`
+	Steps      []*StepRun `json:"steps"`
+}
+
+// StepRun is the result of one scenario step.
+type StepRun struct {
+	Index       int    `json:"index"`
+	Kind        string `json:"kind"`
+	Description string `json:"description"`
+	Changes     bool   `json:"changesCluster"`
+	Status      Level  `json:"status"`
+	// Ran is false for the steps after the one where the scenario stopped.
+	Ran      bool  `json:"ran"`
+	Sections []int `json:"sections,omitempty"`
 }
 
 // Compute sets the overall status from the sections.
@@ -347,6 +384,56 @@ func (p *Printer) table(t *Table) {
 	if t.Truncated > 0 {
 		fmt.Fprintf(p.W, "   %s\n", p.paint(cDim, fmt.Sprintf("… %d more row(s) hidden (--max-rows)", t.Truncated)))
 	}
+}
+
+// ScenarioPlan prints the steps of a scenario before it runs.
+func (p *Printer) ScenarioPlan(sc *ScenarioRun) {
+	fmt.Fprintln(p.W, p.paint(cBold, "Scenario "+sc.Name)+p.paint(cDim, "  ("+sc.Source+")"))
+	for _, st := range sc.Steps {
+		mark := "  read-only"
+		if st.Changes {
+			mark = p.paint(cYellow, "  changes the cluster")
+		}
+		fmt.Fprintf(p.W, "  %d. %s%s\n", st.Index, st.Description, mark)
+	}
+	fmt.Fprintln(p.W)
+}
+
+// StepHeader announces a scenario step.
+func (p *Printer) StepHeader(st *StepRun, total int) {
+	fmt.Fprintln(p.W, p.paint(cBold, fmt.Sprintf("▶ Step %d/%d — %s", st.Index, total, st.Description)))
+	fmt.Fprintln(p.W)
+}
+
+// ScenarioSummary prints the final recap of a scenario.
+func (p *Printer) ScenarioSummary(sc *ScenarioRun) {
+	fmt.Fprintln(p.W, p.paint(cDim, strings.Repeat("═", 78)))
+	fmt.Fprintln(p.W, p.paint(cBold, "Scenario "+sc.Name))
+	for _, st := range sc.Steps {
+		if !st.Ran {
+			fmt.Fprintf(p.W, "  %s %d. %s\n", p.paint(cDim, "[ --- ]"), st.Index, p.paint(cDim, st.Description+" (not run)"))
+			continue
+		}
+		fmt.Fprintf(p.W, "  %s %d. %s\n", p.badge(st.Status), st.Index, st.Description)
+	}
+	fmt.Fprintln(p.W)
+	verdict, lvl := "", Pass
+	switch sc.Outcome {
+	case OutcomeCompleted:
+		verdict = "Scenario completed."
+	case OutcomePlanned:
+		verdict, lvl = "Dry run: nothing was executed.", Info
+	case OutcomeDeclined:
+		verdict, lvl = "Scenario stopped at your request.", Warn
+	case OutcomeCanceled:
+		verdict, lvl = "Scenario interrupted.", Error
+	default:
+		verdict, lvl = "Scenario stopped.", Crit
+	}
+	if sc.Reason != "" {
+		verdict += " " + sc.Reason
+	}
+	fmt.Fprintf(p.W, "%s %s\n", p.badge(lvl), p.paint(levelColor(lvl)+cBold, verdict))
 }
 
 // Summary prints the final recap.

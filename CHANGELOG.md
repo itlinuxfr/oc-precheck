@@ -6,6 +6,17 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- Scenarios: `oc upkit run pre-upgrade|post-upgrade|FILE` chains checks and
+  maintenance actions with a gate after each step (critical or failed step:
+  stop; warnings: confirmation). `--dry-run` shows the plan, `--print` exports
+  a scenario to customize it, `-o json` records who ran it, when, and the
+  result of every step.
+- Scenario step `job`: run a Job from a CronJob and wait for it (e.g. a
+  site-specific etcd backup). The example RBAC grants `create` on Jobs.
+- Built-in scenario steps `removeBanner` and `expireSilences` (silences created
+  by oc-upkit or oc-precheck).
+
 ### Changed
 - **Renamed from `oc-precheck` to `oc-upkit`**: the tool now covers the whole
   upgrade (checks and maintenance operations), not only pre-checks. Install the

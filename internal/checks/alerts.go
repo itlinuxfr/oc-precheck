@@ -313,3 +313,49 @@ func ActionExpireSilence(ctx context.Context, env *Env, o *Options, ids []string
 	}
 	return s
 }
+
+// CreatedByTool reports whether a silence was created by this tool (or by
+// oc-precheck, its former name): the default author and comment both carry
+// the tool name.
+func (x Silence) CreatedByTool() bool {
+	for _, mark := range []string{managedByValue, legacyManagedByValue} {
+		if strings.Contains(x.CreatedBy, mark) || strings.Contains(x.Comment, mark) {
+			return true
+		}
+	}
+	return false
+}
+
+// ToolSilences returns the active silences created by this tool.
+func ToolSilences(ctx context.Context, env *Env, o *Options) ([]Silence, error) {
+	all, err := ListSilences(ctx, env, o)
+	if err != nil {
+		return nil, err
+	}
+	var out []Silence
+	for _, x := range all {
+		if x.Status.State == "active" && x.CreatedByTool() {
+			out = append(out, x)
+		}
+	}
+	return out, nil
+}
+
+// ActionExpireToolSilences expires every active silence created by this tool,
+// typically at the end of a maintenance.
+func ActionExpireToolSilences(ctx context.Context, env *Env, o *Options, dryRun bool) *report.Section {
+	sil, err := ToolSilences(ctx, env, o)
+	if err != nil {
+		return report.NewSection("expire-silence", "Action: expire Alertmanager silence(s)").Fail(err, "")
+	}
+	if len(sil) == 0 {
+		s := report.NewSection("expire-silence", "Action: expire Alertmanager silence(s)")
+		s.Summary = "No active silence created by oc-upkit"
+		return s
+	}
+	ids := make([]string, len(sil))
+	for i, x := range sil {
+		ids[i] = x.ID
+	}
+	return ActionExpireSilence(ctx, env, o, ids, dryRun)
+}

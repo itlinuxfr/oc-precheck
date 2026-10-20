@@ -129,6 +129,7 @@ oc upkit --config upkit.yaml
 
 | Command | Description |
 |---|---|
+| `oc upkit run [SCENARIO\|FILE]` | Run a scenario (`pre-upgrade`, `post-upgrade` or your own file): checks and actions step by step, with a gate after each step. |
 | `oc upkit [check]` | Run the pre-upgrade checks (default command). Optional actions: `--silence`, `--banner`, `--remove-banner`, `--defrag`. |
 | `oc upkit watch` | Live view: nodes (Ready, cordon, MCD state, rendered config current → target, pods), MCPs, cluster update progress; HostedClusters/NodePools on a hub. |
 | `oc upkit drain -l SELECTOR` | Pre-flight analysis, then cordon and drain every node matching a label selector (e.g. a room). |
@@ -213,22 +214,52 @@ the whole list (`aggregate: true`). They can use `params`, `now`,
 
 ```bash
 # Before
-oc upkit --config upkit.yaml --target-version 4.18.24
-oc upkit --silence --silence-duration 4h \
-            --banner "Upgrade to 4.18 in progress — CHG0012345" --banner-link https://itsm.example.com/CHG0012345 \
-            --defrag --dry-run
-oc upkit --silence --banner "Upgrade to 4.18 in progress" --defrag --yes
+oc upkit --config upkit.yaml --target-version 4.18.24   # read-only checks
+oc upkit run pre-upgrade --dry-run                       # show the plan
+oc upkit run pre-upgrade                                 # checks, silence, banner, defrag
 
-# During
+# During: the upgrade is yours to start, oc-upkit never does it
 oc adm upgrade --to=4.18.24
 oc upkit watch
 
 # After
-oc upkit                         # everything green again?
-oc upkit silence list            # UUIDs of the active silences
-oc upkit silence expire <UUID>
-oc upkit banner remove --all
+oc upkit run post-upgrade                                # checks, then banner and silences removed
 ```
+
+## Scenarios
+
+A scenario chains the checks and operations of the tool, with a **gate**
+after each step: a critical (or failed) step stops the scenario before
+anything else changes, a step with warnings asks for confirmation. The plan
+is shown first, and nothing runs before you confirm it.
+
+| Built-in | Steps |
+|---|---|
+| `pre-upgrade` | all checks → silence (4h) → console banner → etcd defragmentation → checks `etcd`, `pods` |
+| `post-upgrade` | all checks → remove the banner → expire the silences created by oc-upkit |
+
+To adapt one to your site, export it, edit it, and run the file:
+
+```bash
+oc upkit run pre-upgrade --print > my-pre-upgrade.yaml
+oc upkit run my-pre-upgrade.yaml -o json > pre-upgrade-report.json
+```
+
+```yaml
+name: my-pre-upgrade
+steps:
+  - check: {}
+  - silence: {duration: 4h, comment: "Upgrade to 4.18 — CHG0012345"}
+  - banner: {text: "Upgrade to 4.18 in progress", link: "https://itsm.example.com/CHG0012345"}
+  - defrag: {}
+  - job: {cronJob: openshift-etcd/etcd-backup, timeout: 1h}   # site-specific backup
+  - check: {checks: [etcd, pods]}
+```
+
+A scenario only uses the operations of the tool (no shell commands) and
+**never starts the upgrade**: that decision stays with the operator. With
+`-o json`, the report records who ran the scenario, when, and the result of
+every step. Reference: [docs/scenarios.md](docs/scenarios.md).
 
 The full runbook is [docs/operations.md](docs/operations.md). It covers
 draining a room and the HyperShift hub workflow.

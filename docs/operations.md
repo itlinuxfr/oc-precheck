@@ -6,6 +6,12 @@ datacenter maintenance. Commands are shown as `oc upkit`; use
 
 ## 1. Cluster upgrade
 
+> **Shortcut:** the "right before" and "after" steps below are what the
+> built-in scenarios run, with a gate after each step:
+> `oc upkit run pre-upgrade`, then `oc adm upgrade`, then
+> `oc upkit run post-upgrade`. See [scenarios.md](scenarios.md). This page
+> keeps the individual commands, for when you need to do one step by hand.
+
 ### Days before
 
 ```bash
