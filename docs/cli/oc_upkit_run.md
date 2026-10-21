@@ -39,10 +39,11 @@ oc upkit run [SCENARIO | FILE] [flags]
 ### Options
 
 ```
-      --dry-run   Show the plan without running anything
-  -h, --help      help for run
-      --print     Print the scenario as YAML and exit (to customize a built-in one)
-  -y, --yes       Do not ask for confirmation (critical steps still stop the scenario)
+      --dry-run                 Show the plan without running anything
+  -h, --help                    help for run
+      --print                   Print the scenario as YAML and exit (to customize a built-in one)
+      --target-version string   Target version (e.g. 4.18.24), validated against the update graph by the clusterversion check
+  -y, --yes                     Do not ask for confirmation (critical steps still stop the scenario)
 ```
 
 ### Options inherited from parent commands

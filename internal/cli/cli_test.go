@@ -7,10 +7,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/itlinuxfr/oc-upkit/internal/checks"
 )
 
 func run(t *testing.T, args ...string) (string, string, error) {
@@ -179,5 +182,60 @@ func TestRunInvalidScenario(t *testing.T) {
 	_, _, err := run(t, "run", p)
 	if exitCode(err) != CodeUsage || !strings.Contains(err.Error(), `unknown check "etcdd"`) || !strings.Contains(err.Error(), "banner text") {
 		t.Fatalf("invalid scenario: %v", err)
+	}
+}
+
+func TestRunScenarioRules(t *testing.T) {
+	dir := t.TempDir()
+	write := func(name, body string) string {
+		p := filepath.Join(dir, name)
+		if err := os.WriteFile(p, []byte(body), 0o600); err != nil {
+			t.Fatal(err)
+		}
+		return p
+	}
+	rule := `
+customRules:
+  - id: site.min-replicas
+    apiVersion: apps/v1
+    resource: deployments
+    expr: %s
+steps:
+  - check: {checks: [custom], rules: [%s]}
+`
+	// Invalid CEL, unknown referenced rule: usage errors, before any connection.
+	bad := write("bad.yaml", "name: bad\n"+fmt.Sprintf(rule, "object.spec.replicas >=", "site.min-replicas"))
+	if _, _, err := run(t, "run", bad, "--dry-run"); exitCode(err) != CodeUsage || !strings.Contains(err.Error(), "site.min-replicas") {
+		t.Fatalf("bad CEL: %v", err)
+	}
+	unknown := write("unknown.yaml", "name: u\n"+fmt.Sprintf(rule, "object.spec.replicas >= 2", "site.nope"))
+	if _, _, err := run(t, "run", unknown, "--dry-run"); exitCode(err) != CodeUsage || !strings.Contains(err.Error(), `unknown custom rule "site.nope"`) {
+		t.Fatalf("unknown rule: %v", err)
+	}
+	// Same ID in the configuration and in the scenario.
+	cfg := write("upkit.yaml", "customRules:\n  - id: site.min-replicas\n    apiVersion: apps/v1\n    resource: deployments\n    expr: 'true'\n")
+	good := write("good.yaml", "name: g\n"+fmt.Sprintf(rule, "object.spec.replicas >= 2", "site.min-replicas"))
+	if _, _, err := run(t, "run", good, "--dry-run", "--config", cfg); exitCode(err) != CodeUsage || !strings.Contains(err.Error(), "duplicate") {
+		t.Fatalf("duplicate rule: %v", err)
+	}
+	// A valid scenario passes validation and only fails on the connection.
+	if _, _, err := run(t, "run", good, "--dry-run", "--target-version", "4.18.24", "--server", "https://127.0.0.1:1", "--request-timeout", "1s"); exitCode(err) != CodeError {
+		t.Fatalf("valid scenario: %v", err)
+	}
+}
+
+func TestWithRules(t *testing.T) {
+	o := checks.DefaultOptions()
+	rules, err := checks.CompileCustomRules([]checks.CustomRuleSpec{
+		{ID: "a", APIVersion: "v1", Resource: "pods", Expr: "true"},
+		{ID: "b", APIVersion: "v1", Resource: "pods", Expr: "true"},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	o.CustomRules = rules
+	f := withRules(o, []string{"b"})
+	if len(f.CustomRules) != 1 || f.CustomRules[0].ID != "b" || len(o.CustomRules) != 2 {
+		t.Fatalf("filtered %d, original %d", len(f.CustomRules), len(o.CustomRules))
 	}
 }

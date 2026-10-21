@@ -26,7 +26,11 @@ import (
 type Scenario struct {
 	Name        string `json:"name"`
 	Description string `json:"description,omitempty"`
-	Steps       []Step `json:"steps"`
+	// CustomRules are CEL rules carried by the scenario, in the format of the
+	// customRules section of the configuration file. They are added to the
+	// rules of the configuration for this run.
+	CustomRules []checks.CustomRuleSpec `json:"customRules,omitempty"`
+	Steps       []Step                  `json:"steps"`
 }
 
 // Step holds exactly one operation.
@@ -44,6 +48,9 @@ type Step struct {
 type CheckStep struct {
 	Checks []string `json:"checks,omitempty"`
 	Skip   []string `json:"skip,omitempty"`
+	// Rules restricts the custom rules evaluated at this step (IDs from the
+	// scenario or the configuration file). Empty means every custom rule.
+	Rules []string `json:"rules,omitempty"`
 }
 
 // SilenceStep creates an Alertmanager silence. It is skipped when a silence
@@ -88,6 +95,35 @@ type RemoveBannerStep struct {
 
 // ExpireSilencesStep expires every active silence created by the tool.
 type ExpireSilencesStep struct{}
+
+// RunsCustom reports whether the step runs the "custom" check.
+func (c *CheckStep) RunsCustom() bool {
+	for _, x := range c.Skip {
+		if x == "custom" {
+			return false
+		}
+	}
+	if len(c.Checks) == 0 {
+		return true
+	}
+	for _, x := range c.Checks {
+		if x == "custom" {
+			return true
+		}
+	}
+	return false
+}
+
+// RuleRefs returns the custom rule IDs referenced by the steps.
+func (sc *Scenario) RuleRefs() []string {
+	var ids []string
+	for _, st := range sc.Steps {
+		if st.Check != nil {
+			ids = append(ids, st.Check.Rules...)
+		}
+	}
+	return ids
+}
 
 // Defaults applied to the steps that leave a field empty.
 const (
@@ -134,6 +170,9 @@ func (s Step) Describe() string {
 		}
 		if len(s.Check.Skip) > 0 {
 			d += " (skip " + strings.Join(s.Check.Skip, ", ") + ")"
+		}
+		if len(s.Check.Rules) > 0 {
+			d += " — custom rules: " + strings.Join(s.Check.Rules, ", ")
 		}
 		return d
 	case s.Silence != nil:
@@ -195,6 +234,9 @@ func (sc *Scenario) Validate(knownChecks []string) error {
 				if !known[c] {
 					at("unknown check %q", c)
 				}
+			}
+			if len(st.Check.Rules) > 0 && !st.Check.RunsCustom() {
+				at("rules needs the custom check (add it to checks, or remove it from skip)")
 			}
 		case st.Silence != nil:
 			if st.Silence.Duration.Duration < 0 {

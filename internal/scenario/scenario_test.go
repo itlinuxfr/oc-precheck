@@ -205,3 +205,56 @@ func TestRunnerCanceled(t *testing.T) {
 		t.Fatalf("canceled: %+v", run)
 	}
 }
+
+func TestScenarioCustomRules(t *testing.T) {
+	doc := `
+name: mine
+customRules:
+  - id: site.min-replicas
+    apiVersion: apps/v1
+    resource: deployments
+    expr: object.spec.replicas >= 2
+steps:
+  - check: {}
+  - check: {checks: [custom], rules: [site.min-replicas]}
+`
+	sc, err := Parse([]byte(doc))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := sc.Validate(append(known, "custom")); err != nil {
+		t.Fatal(err)
+	}
+	if len(sc.CustomRules) != 1 || sc.CustomRules[0].ID != "site.min-replicas" {
+		t.Fatalf("rules: %+v", sc.CustomRules)
+	}
+	if refs := sc.RuleRefs(); len(refs) != 1 || refs[0] != "site.min-replicas" {
+		t.Fatalf("refs: %v", refs)
+	}
+	if d := sc.Steps[1].Describe(); !strings.Contains(d, "custom rules: site.min-replicas") {
+		t.Fatal(d)
+	}
+
+	cases := map[string]bool{ // step -> runs the custom check
+		"check: {}":                                 true,
+		"check: {checks: [custom, etcd]}":           true,
+		"check: {checks: [etcd]}":                   false,
+		"check: {skip: [custom]}":                   false,
+		"check: {checks: [etcd], rules: [a]}":       false,
+		"check: {skip: [custom], rules: [a]}":       false,
+		"check: {checks: [custom], skip: [custom]}": false,
+	}
+	for step, want := range cases {
+		sc, err := Parse([]byte("name: x\nsteps:\n- " + step))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if got := sc.Steps[0].Check.RunsCustom(); got != want {
+			t.Errorf("%s: RunsCustom=%v", step, got)
+		}
+		err = sc.Validate(append(known, "custom"))
+		if strings.Contains(step, "rules") && (err == nil || !strings.Contains(err.Error(), "rules needs the custom check")) {
+			t.Errorf("%s: %v", step, err)
+		}
+	}
+}

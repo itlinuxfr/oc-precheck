@@ -261,6 +261,10 @@ A scenario only uses the operations of the tool (no shell commands) and
 `-o json`, the report records who ran the scenario, when, and the result of
 every step. Reference: [docs/scenarios.md](docs/scenarios.md).
 
+A scenario can also **carry its own checks**: CEL rules in a `customRules`
+section, selected per step with `rules`. Step-by-step guide:
+[docs/guide-custom-checks.md](docs/guide-custom-checks.md).
+
 The full runbook is [docs/operations.md](docs/operations.md). It covers
 draining a room and the HyperShift hub workflow.
 

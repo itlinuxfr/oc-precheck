@@ -1,0 +1,89 @@
+# A site-specific pre-upgrade scenario that carries its own checks.
+# Walk-through: docs/guide-custom-checks.md
+#
+#   oc upkit run examples/scenario-custom-rules.yaml --dry-run
+#   oc upkit run examples/scenario-custom-rules.yaml --target-version 4.18.24
+#
+# The rules below are checked by the test suite: keep them working.
+name: example-pre-upgrade
+description: Pre-upgrade with site rules, an etcd backup and a check that the backup succeeded
+
+customRules:
+  # Every Argo CD Application must be Synced and Healthy before an upgrade.
+  - id: site.argocd-synced
+    description: Argo CD Applications are Synced and Healthy
+    apiVersion: argoproj.io/v1alpha1
+    resource: applications
+    # has() only tests the last field: test object.status first, it is
+    # missing on an Application that was just created.
+    expr: >-
+      has(object.status) &&
+      has(object.status.sync) && object.status.sync.status == "Synced" &&
+      has(object.status.health) && object.status.health.status == "Healthy"
+    messageExpression: >-
+      !has(object.status) ? "no status yet" :
+      "sync=" + (has(object.status.sync) ? object.status.sync.status : "unknown") +
+      ", health=" + (has(object.status.health) ? object.status.health.status : "unknown")
+
+  # Application Deployments need 2 replicas to survive the node reboots.
+  - id: site.min-replicas
+    description: Application Deployments have at least 2 replicas
+    apiVersion: apps/v1
+    resource: deployments
+    match: >-
+      !object.metadata.namespace.startsWith("openshift-") &&
+      !object.metadata.namespace.startsWith("kube-")
+    expr: '!has(object.spec.replicas) || object.spec.replicas == 0 || object.spec.replicas >= params.minReplicas'
+    messageExpression: '"only " + string(object.spec.replicas) + " replica(s)"'
+    params:
+      minReplicas: 2
+
+  # No node may still carry the maintenance label of a previous intervention.
+  - id: site.no-node-in-maintenance
+    description: No node carries the maintenance label
+    apiVersion: v1
+    resource: nodes
+    labelSelector: example.com/maintenance=true
+    aggregate: true
+    expr: size(objects) == 0
+    messageExpression: '"nodes in maintenance: " + objects.map(n, n.metadata.name).join(", ")'
+    severity: crit
+
+  # A backup Job of the CronJob succeeded less than maxAge ago.
+  - id: site.etcd-backup-recent
+    description: An etcd backup succeeded recently
+    apiVersion: batch/v1
+    resource: jobs
+    namespaces: [openshift-etcd]
+    match: object.metadata.name.startsWith(params.prefix)
+    aggregate: true
+    expr: >-
+      objects.exists(j,
+        has(j.status.succeeded) && j.status.succeeded > 0 &&
+        has(j.status.completionTime) &&
+        now - timestamp(j.status.completionTime) < duration(params.maxAge))
+    message: No successful etcd backup in the last 2 hours
+    params:
+      prefix: etcd-backup
+      maxAge: 2h
+    severity: crit
+
+steps:
+  # 1. Gate: every check, and the rules above except the backup one (the
+  #    backup is only taken at step 5).
+  - check:
+      rules: [site.argocd-synced, site.min-replicas, site.no-node-in-maintenance]
+  - silence:
+      duration: 4h
+      comment: OpenShift upgrade in progress (oc-upkit)
+  - banner:
+      text: OpenShift upgrade in progress
+  - defrag: {}
+  # 5. Site-specific backup: a Job created from the CronJob.
+  - job:
+      cronJob: openshift-etcd/etcd-backup
+      timeout: 1h
+  # 6. Last gate: etcd and pods again, and only the backup rule.
+  - check:
+      checks: [etcd, pods, custom]
+      rules: [site.etcd-backup-recent]
